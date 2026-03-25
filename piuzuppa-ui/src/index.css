@@ -5,6 +5,7 @@
   --color-giallo: #fccc02;
   --color-bordeaux: #9b0539;
   --color-bianco: #f1f5ee;
+  --color-sabbia: #ffec99;
 }
 
 :root {
@@ -15,7 +16,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--color-bianco);
+  background:
+    radial-gradient(circle , rgba(252, 204, 2, 0.28), transparent 32%),
+    linear-gradient(180deg, var(--color-bianco) 0%, var(--color-salvia) 58%, var(--color-sabbia) 100%);
   color: #1f2937;
   font-family: system-ui, sans-serif;
 }
