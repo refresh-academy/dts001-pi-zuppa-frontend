@@ -1,13 +1,32 @@
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
+import { verifyCredentials } from "../api/mock-backend"
 import logo from "../assets/logo.png"
 
 export function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    console.log("username:", username, "password:", password)
+
+    const result = await verifyCredentials(username, password)
+
+    if (result.status === "username-error") {
+      setSuccessMessage("")
+      setErrorMessage("Nome utente non trovato")
+      return
+    }
+
+    if (result.status === "password-error") {
+      setSuccessMessage("")
+      setErrorMessage("Password non corretta")
+      return
+    }
+
+    setErrorMessage("")
+    setSuccessMessage(`Benvenuta/o ${result.user.nome}`)
     setUsername("")
     setPassword("")
   }
@@ -44,6 +63,10 @@ export function Login() {
             />
           </div>
         </div>
+        {errorMessage ? <p className="text-red-700">{errorMessage}</p> : null}
+        {successMessage ? (
+          <p className="text-green-700">{successMessage}</p>
+        ) : null}
 
         <button
           type="submit"

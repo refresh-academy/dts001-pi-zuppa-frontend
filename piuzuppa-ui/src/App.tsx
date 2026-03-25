@@ -1,11 +1,9 @@
-import {Login} from "./components/login.tsx"
-import './App.css'
+import { Login } from "./components/login"
+import "./App.css"
 function App() {
-
-
   return (
     <>
-    <Login/>
+      <Login />
     </>
   )
 }
