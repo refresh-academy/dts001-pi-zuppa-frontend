@@ -1,4 +1,4 @@
-import {Login} from "../public/components/login.tsx"
+import {Login} from "./components/login.tsx"
 import './App.css'
 function App() {
 
