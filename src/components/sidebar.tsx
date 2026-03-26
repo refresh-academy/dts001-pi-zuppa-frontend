@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import type { SidebarConfig } from "../types/piuzuppa";
+import logo from "../assets/logo.png"
 
 type SidebarItemProps = {
   path: string;
@@ -53,10 +54,11 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
             </ul>
           </div>
     
-          <div className="absolute top-4 -left-2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[8px] border-r-amber-900" />
+          <div className="absolute top-4 -left-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-amber-900" />
         </div>
       )}
     </li>
+    
   );
 };
 
@@ -90,6 +92,7 @@ export const Sidebar = ({ sidebarItems }: SidebarProps) => {
           />
         ))}
       </ul>
+      <img src={logo} className="w-60 pt-20" alt="Più Zuppa" />
     </div>
   );
 };

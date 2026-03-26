@@ -17,6 +17,7 @@ export type ospite = {
     professione: string,
     telefono: number,
     enteSegnalazione: string,
+    ricevimentoPasto: "mensa" | "asporto",
     pasti: Pasto[]
 }
 type Pasto = {

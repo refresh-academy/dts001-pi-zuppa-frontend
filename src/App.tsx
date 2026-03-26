@@ -4,6 +4,7 @@ import { Navbar } from "./components/navbar"
 import { Sidebar } from "./components/sidebar"
 import { Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
+import { AnagraficaOspite } from "./components/GestioneAnagrafiche"
 
 const sidebarItems: SidebarConfig[] = [
   {
@@ -51,6 +52,18 @@ function App() {
               <>
                 <Navbar />
                 <Sidebar sidebarItems={sidebarItems} />
+              </>
+            }
+          />
+          <Route
+            path="anagrafiche"
+            element={
+              <>
+                <Navbar />
+                <div className="flex">
+                <Sidebar sidebarItems={sidebarItems} />
+                <AnagraficaOspite />
+                </div>
               </>
             }
           />
