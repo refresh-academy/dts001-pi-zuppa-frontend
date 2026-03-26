@@ -25,7 +25,6 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
         <span>{label}</span>
       </NavLink>
 
-      {/* The Sub-Chalkboard */}
       {subItems && (
         <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-50 min-w-[240px]">
           <div 
@@ -53,7 +52,7 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
               ))}
             </ul>
           </div>
-          {/* Subtle "connector" arrow pointing back to the father link */}
+    
           <div className="absolute top-4 -left-2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[8px] border-r-amber-900" />
         </div>
       )}
@@ -68,7 +67,7 @@ type SidebarProps = {
 export const Sidebar = ({ sidebarItems }: SidebarProps) => {
   return (
     <div 
-      className="sticky top-0 h-min py-4 w-max ml-4 mt-6 rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 shadow-2xl"
+      className="sticky top-0 ml-4 mt-6 min-h-[60vh] w-max rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 py-8 shadow-2xl"
       style={{
         backgroundColor: "#0a0a0a",
         backgroundImage: `
@@ -77,11 +76,11 @@ export const Sidebar = ({ sidebarItems }: SidebarProps) => {
         `,
       }}
     >
-      {/* Decorative Chalk Corner Stains */}
+
       <div className="absolute bottom-0 left-0 w-16 h-16 bg-linear-to-tr from-white/5 to-transparent pointer-events-none" />
       <div className="absolute top-0 right-0 w-12 h-12 bg-linear-to-bl from-white/5 to-transparent pointer-events-none" />
       
-      <ul className="relative z-10 space-y-1 px-3">
+      <ul className="relative z-10 space-y-3 px-4">
         {sidebarItems.map((item) => (
           <SidebarItem 
             key={item.key} 
