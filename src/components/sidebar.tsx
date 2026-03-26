@@ -13,8 +13,8 @@ const SidebarItem = ({ path, label }: SidebarItemProps) => {
         to={`/${path}`}
         className={({ isActive }: { isActive: boolean }) =>
           `flex gap-8 px-6 py-1 font-bold  ${isActive
-            ? " text-black hover:bg-giallo"
-            : "text-bordeaux hover:bg-giallo"}`
+            ? "bg-giallo text-black hover:bg-sabbia"
+            : "bg-sabbia text-bordeaux hover:bg-giallo"}`
         }
       >
         {label}
@@ -29,7 +29,7 @@ type SidebarProps = {
 
 export const Sidebar = ({ sidebarItems }: SidebarProps) => {
   return (
-    <div className="sticky top-0 h-screen gap-16 bg-sabbia py-4 w-min border-l-14 border-salvia">
+    <div className="sticky top-0 h-screen gap-16  bg-sabbia py-4 w-min ml-4 mt-6 rounded-2xl border-2 border-bordeaux ">
       <ul className="space-y-1 px-3">
         {sidebarItems.map((item) => (
           <SidebarItem
