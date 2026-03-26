@@ -51,7 +51,7 @@ export function Login() {
               type="text"
               value={username}
               placeholder="inserisci nome utente"
-              className="border-2 bg-sabbia"
+              className="border-2 bg-sabbia  border-bordeaux rounded-md pl-2"
             />
             <input
               id="password"
@@ -59,7 +59,7 @@ export function Login() {
               type="password"
               value={password}
               placeholder="inserisci password"
-              className="border-2 bg-sabbia"
+              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2"
             />
           </div>
         </div>
@@ -70,7 +70,7 @@ export function Login() {
 
         <button
           type="submit"
-          className="w-32 cursor-pointer border-2 bg-giallo shadow-lg hover:scale-110"
+          className="w-32 cursor-pointer border-2  border-bordeaux text-bordeaux font-bold bg-giallo rounded-md shadow-lg hover:scale-110"
         >
           Accedi
         </button>

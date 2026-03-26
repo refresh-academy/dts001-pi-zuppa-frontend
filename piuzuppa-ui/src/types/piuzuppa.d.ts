@@ -19,3 +19,22 @@ export type ospite = {
     enteSegnalazione: string,
     
 }
+
+
+/* export type SidebarOption =
+    | "gestione-anagrafiche"
+    | "gestione-magazzino"
+    | "gestione-cucina"
+    | "gestione-accoglienza/distribuzione"
+    | "gestione-utenti"
+    
+
+export type SidebarConfig ={
+
+  key: SidebarOption,
+  label:string,
+  path:string,
+  
+} */
+  
+ 
