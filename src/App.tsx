@@ -10,6 +10,12 @@ const sidebarItems: SidebarConfig[] = [
     key: "anagrafiche",
     label: "Anagrafiche",
     path: "anagrafiche",
+    subItems : [
+      {label: "Inserimento nuovo ospite", path: "nuovo-ospite"},
+      {label:"Modifica anagrafica ospite", path: "modifica-ospite"},
+      {label: "Anagrafica enti", path: "anagrafica-enti"}
+
+]
   },
   {
     key: "magazzino",

@@ -38,6 +38,10 @@ export type SidebarConfig ={
   key: SidebarOption,
   label:string,
   path:string,
+  subItems?: {
+    label: string,
+    path: string
+  }[]
   
 } 
   
