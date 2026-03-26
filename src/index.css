@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Chalkfont'; /* Use font-family to name it, not font-display */
+  src: url('assets/Virgil.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; 
+}
+
 @theme {
+  /* This creates the .font-chalk utility class */
+  --font-chalk: "Chalkfont", system-ui, sans-serif;
+
   --color-salvia: #c9e9d9;
   --color-giallo: #fccc02;
   --color-bordeaux: #9b0539;
@@ -20,7 +31,9 @@ body {
     radial-gradient(circle , rgba(252, 204, 2, 0.28), transparent 32%),
     linear-gradient(180deg, var(--color-bianco) 0%, var(--color-salvia) 58%, var(--color-sabbia) 100%);
   color: #1f2937;
-  font-family: system-ui, sans-serif;
+  
+  /* Apply your theme font variable here */
+  font-family: var(--font-chalk);
 }
 
 #root {
