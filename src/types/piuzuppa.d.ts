@@ -25,7 +25,7 @@ type Pasto = {
 }
 
 
-/* export type SidebarOption =
+export type SidebarOption =
     | "gestione-anagrafiche"
     | "gestione-magazzino"
     | "gestione-cucina"
@@ -39,6 +39,6 @@ export type SidebarConfig ={
   label:string,
   path:string,
   
-} */
+} 
   
  
