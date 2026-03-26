@@ -39,7 +39,7 @@ type SidebarProps = {
 export const Sidebar = ({ sidebarItems }: SidebarProps) => {
   return (
     <div 
-      className="sticky top-0 gap-16 h-full py-4 w-min ml-4 mt-6 rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 shadow-2xl shadow-black overflow-hidden"
+      className="sticky top-0 ml-4 mt-6 h-[65vh] w-min gap-16 overflow-hidden rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 py-8 shadow-2xl shadow-black"
       style={{
         backgroundColor: "#0a0a0a",
         backgroundImage: `
@@ -50,7 +50,7 @@ export const Sidebar = ({ sidebarItems }: SidebarProps) => {
     >
       <div className="absolute bottom-0 left-0 w-12 h-12 bg-linear-to-tr from-pink-500/20 via-yellow-500/20 to-transparent -rotate-45 transform translate-y-6 -translate-x-6" />
       
-      <ul className="relative z-10 space-y-1 px-3">
+      <ul className="relative z-10 space-y-4 px-4">
         {sidebarItems.map((item) => (
           <SidebarItem key={item.key} path={item.path} label={item.label} />
         ))}
