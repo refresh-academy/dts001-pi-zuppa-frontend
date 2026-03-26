@@ -26,11 +26,11 @@ type Pasto = {
 
 
 export type SidebarOption =
-    | "gestione-anagrafiche"
-    | "gestione-magazzino"
-    | "gestione-cucina"
-    | "gestione-accoglienza/distribuzione"
-    | "gestione-utenti"
+    | "anagrafiche"
+    | "magazzino"
+    | "cucina"
+    | "accoglienza"
+    | "utenti"
     
 
 export type SidebarConfig ={

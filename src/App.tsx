@@ -7,29 +7,29 @@ import type { SidebarConfig } from "./types/piuzuppa"
 
 const sidebarItems: SidebarConfig[] = [
   {
-    key: "gestione-anagrafiche",
-    label: "Gestione Anagrafiche",
-    path: "gestione-anagrafiche",
+    key: "anagrafiche",
+    label: "Anagrafiche",
+    path: "anagrafiche",
   },
   {
-    key: "gestione-magazzino",
-    label: "Gestione Magazzino",
-    path: "gestione-magazzino",
+    key: "magazzino",
+    label: "Magazzino",
+    path: "magazzino",
   },
   {
-    key: "gestione-cucina",
-    label: "Gestione Cucina",
-    path: "gestione-cucina",
+    key: "cucina",
+    label: "Cucina",
+    path: "cucina",
   },
   {
-    key: "gestione-accoglienza/distribuzione",
-    label: "Gestione Accoglienza/Distribuzione",
-    path: "gestione-accoglienza-distribuzione",
+    key: "accoglienza",
+    label: "Accoglienza",
+    path: "accoglienza",
   },
   {
-    key: "gestione-utenti",
-    label: "Gestione Utenti",
-    path: "gestione-utenti",
+    key: "utenti",
+    label: "Utenti",
+    path: "utenti",
   },
 ]
 
