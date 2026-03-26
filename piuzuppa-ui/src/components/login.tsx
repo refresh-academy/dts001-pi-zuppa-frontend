@@ -70,7 +70,7 @@ export function Login() {
 
         <button
           type="submit"
-          className="w-32 cursor-pointer border-2  border-bordeaux text-bordeaux font-bold bg-giallo rounded-md shadow-lg hover:scale-110"
+          className="w-32 cursor-pointer border-4  border-bordeaux text-bordeaux font-bold bg-giallo rounded-md  p-1 shadow-lg hover:scale-110"
         >
           Accedi
         </button>
