@@ -17,7 +17,11 @@ export type ospite = {
     professione: string,
     telefono: number,
     enteSegnalazione: string,
-    
+    pasti: Pasto[]
+}
+type Pasto = {
+    id: number, 
+    preferenzaAlimentare: "standard | vegetariano | vegano | halal"
 }
 
 
