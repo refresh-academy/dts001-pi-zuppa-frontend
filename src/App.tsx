@@ -5,7 +5,7 @@ import { Sidebar } from "./components/sidebar"
 import { Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
-import { AnagraficaUtenti } from "./components/GestioneUtenti"
+import { AnagraficaUtenti } from "./components/NuovoUtente"
 import { AnagraficaOspite, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 
@@ -16,7 +16,7 @@ const sidebarItems: SidebarConfig[] = [
     path: "anagrafiche",
     subItems : [
       {label: "Inserimento nuovo ospite", path: "nuovo-ospite"},
-      {label:"Modifica anagrafica ospite", path: "modifica-ospite"},
+      {label: "Anagrafica Ospiti", path: "anagrafica-ospiti"},
       {label: "Anagrafica enti", path: "anagrafica-enti"}
 
 ]
@@ -25,6 +25,11 @@ const sidebarItems: SidebarConfig[] = [
     key: "magazzino",
     label: "Magazzino",
     path: "magazzino",
+    subItems : [
+      {label: "Giacenze", path: "giacenze"},
+      {label: "Stoccaggio", path: "stoccaggio"},
+      {label: "Prelievo", path: "prelievo"}
+    ]
   },
   {
     key: "cucina",
@@ -40,6 +45,10 @@ const sidebarItems: SidebarConfig[] = [
     key: "utenti",
     label: "Utenti",
     path: "utenti",
+    subItems : [
+      {label: "Inserimento nuovo utente", path: "nuovo-utente"},
+      {label: "Anagrafica utenti", path: "anagrafica-utenti"}
+    ]
   },
 ]
 
