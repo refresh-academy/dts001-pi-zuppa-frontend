@@ -48,7 +48,7 @@ const sidebarItems: SidebarConfig[] = [
     path: "utenti",
     subItems : [
       {label: "Inserimento nuovo utente", path: "nuovo-utente"},
-      {label: "Anagrafica utenti", path: "anagrafica-utenti"}
+      {label: "Anagrafica utenti", path: "utenti"}
     ]
   },
 ]
