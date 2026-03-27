@@ -1,10 +1,14 @@
 import { useState, type FormEvent } from "react"
+import { Eye, EyeOff } from "lucide-react"
+import { useNavigate } from "react-router"
 import { verifyCredentials } from "../api/mock-backend"
 import logo from "../assets/logo.png"
 
 export function Login() {
+  const navigate = useNavigate()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
 
@@ -26,9 +30,11 @@ export function Login() {
     }
 
     setErrorMessage("")
-    setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome}`)
+    setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome} `)
     setUsername("")
     setPassword("")
+    setShowPassword(false)
+    navigate("/home")
   }
 
   return (
@@ -53,14 +59,26 @@ export function Login() {
               placeholder="inserisci nome utente"
               className="border-2 bg-sabbia  border-bordeaux rounded-md pl-2"
             />
-            <input
-              id="password"
-              onChange={(event) => setPassword(event.target.value)}
-              type="password"
-              value={password}
-              placeholder="inserisci password"
-              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                id="password"
+                onChange={(event) => setPassword(event.target.value)}
+                type={showPassword ? "text" : "password"}
+                value={password}
+                placeholder="inserisci password"
+                className="border-2 bg-sabbia border-bordeaux rounded-md pl-2"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((currentValue) => !currentValue)}
+                className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-bordeaux bg-sabbia text-bordeaux hover:bg-giallo"
+                aria-label={
+                  showPassword ? "Nascondi password" : "Mostra password"
+                }
+              >
+                {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
+              </button>
+            </div>
           </div>
         </div>
         {errorMessage ? <p className="text-red-700">{errorMessage}</p> : null}
