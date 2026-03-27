@@ -7,7 +7,7 @@ puntiDistribuzione: PuntoDiDistribuzione[]
 ruoli: Ruolo[]
 }
 
-type PuntoDiDistribuzione = "saffi" | "battiferro" | "sandonato" | "savena"
+type PuntoDiDistribuzione = "Saffi" | "Battiferro" | "San Donato" | "Savena"
 
 type Ruolo = "cucina" | "magazzino" | "accoglienza"
 

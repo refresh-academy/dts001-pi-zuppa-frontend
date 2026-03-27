@@ -1,43 +1,59 @@
-import type { user } from "../types/piuzuppa"
+import type { PuntoDiDistribuzione, Ruolo, user } from "../types/piuzuppa"
 
 const mockUsers: user[] = [
   {
-    nome: "Irene",
-    cognome: "Ruscelli",
+    nomeECognome: "Irene Ruscelli",
     username: "irene.ruscelli",
     password: "1312Izzy<32024Lea",
     livelloAccesso: "volontario",
-    puntoDistribuzione: "saffi",
-    ruolo: "cucina",
+    puntiDistribuzione: ["Saffi"],
+    ruoli: ["cucina"]
   },
   {
-      nome: "Svetlana",
-      cognome: "Vitu",
+      nomeECognome: "Svetlana Vitu",
       username: "svetty",
       password: "panda",
       livelloAccesso: "coordinatore",
-      puntoDistribuzione: "savena",
-      ruolo: "cucina"
+      puntiDistribuzione: ["Savena"],
+      ruoli: ["cucina"]
   },
   {
-      nome: "Simone",
-      cognome: "Querzoli",
+      nomeECognome: "Simone Querzoli",
       username: "Paddington",
       password: "fabrizioèuncornuto",
       livelloAccesso: "volontario",
-      puntoDistribuzione: "sandonato",
-      ruolo: "magazzino"
+      puntiDistribuzione: ["San Donato"],
+      ruoli: ["magazzino"]
   },
   {
-      nome: "Nicolas",
-      cognome: "Carotenuto",
+      nomeECognome: "Nicolas Carotenuto",
       username: "Niko.car",
       password: "overwatch",
       livelloAccesso: "coordinatore",
-      puntoDistribuzione: "battiferro",
-      ruolo: "magazzino"
+      puntiDistribuzione: ["Battiferro"],
+      ruoli: ["magazzino"]
   }
 ]
+export function addNewUser (
+  newNomeECognome: string, 
+  newUsername: string, 
+  newPassword: string, 
+  newLivelloAccesso: string, 
+  newPuntiDistribuzione: PuntoDiDistribuzione[], 
+  newRuoli: Ruolo[]) {
+  
+  const newUser: user = {
+    nomeECognome: newNomeECognome,
+    username: newUsername,
+    password: newPassword,
+    livelloAccesso: newLivelloAccesso as any,
+    puntiDistribuzione: newPuntiDistribuzione,
+    ruoli: newRuoli
+  };
+
+  mockUsers.push(newUser); 
+}
+
 
 export type VerifyCredentialsResult =
   | { status: "success"; user: user }
