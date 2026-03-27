@@ -7,6 +7,7 @@ import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
 import { AnagraficaUtenti } from "./components/GestioneUtenti"
 import { AnagraficaOspite, } from "./components/GestioneAnagrafiche"
+import { GestioneMagazzino } from "./components/GestioneMagazzino"
 
 const sidebarItems: SidebarConfig[] = [
   {
@@ -93,6 +94,18 @@ function App() {
                 </div>
               </>
             }/>
+          <Route
+            path="magazzino"
+            element={
+              <>
+                <Navbar />
+                <div className="flex mr-4">
+                  <Sidebar sidebarItems={sidebarItems} />
+                  <GestioneMagazzino />
+                </div>
+                </>
+            }/>
+                
         {/* <Route path='' element = {<Login/>}/>
        
        <Route path='Forse' element = {<Forse/>}/>
