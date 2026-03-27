@@ -6,7 +6,7 @@ import type {
 
 const STORAGE_KEY = "piuzuppa_users";
 
-const getInitialUsers = (): user[] => {
+ export const getInitialUsers = (): user[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     return JSON.parse(saved);

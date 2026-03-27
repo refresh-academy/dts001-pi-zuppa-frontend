@@ -6,7 +6,7 @@ import type {
   user,
 } from "../types/piuzuppa"
 
-export function AnagraficaUtenti() {
+export function NuovoUtente() {
     const [nameAndSurname, setNameAndSurname] = useState("")
     const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">("")
     const [site, setSite] = useState<PuntoDiDistribuzione[]>([])
