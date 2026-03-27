@@ -26,6 +26,9 @@ export function AnagraficaOspite() {
                 <Search size={16} strokeWidth={2.4} />
               </div>
             </div>
+            <button className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1">
+              Nuovo
+            </button>
           </div>
         </form>
 
@@ -36,22 +39,34 @@ export function AnagraficaOspite() {
                 <tr>
                   <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Nome</th>
                   <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Cognome</th>
+                  <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Data di nascita</th>
                   <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Telefono</th>
-                  <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Ente</th>
+                  <th className="px-5 py-3 text-sm font-bold uppercase tracking-wide">Ente</th>
+                  <th className="px-6 py-3 text-sm font-bold uppercase tracking-wide">Ricevimento pasto</th>
+                  <th className="px-4 py-3 text-sm font-bold uppercase tracking-wide">Residente</th>
+
+                
+                
                 </tr>
               </thead>
               <tbody className="bg-sabbia text-bordeaux">
                 <tr className="border-t-2 border-amber-900/40">
                   <td className="px-4 py-3">Mario</td>
-                  <td className="px-4 py-3">Rossi</td>
-                  <td className="px-4 py-3">333 1234567</td>
+                  <td className="px-7 py-3">Rossi</td>
+                  <td className="px-8 py-3">26/04/1985</td>
+                  <td className="px-2 py-3">333 1234567</td>
                   <td className="px-4 py-3">Caritas</td>
+                  <td className="px-18 py-">Mensa</td>
+                  <td className="px-13 py-3">No</td>
                 </tr>
                 <tr className="border-t-2 border-amber-900/40">
                   <td className="px-4 py-3">Anna</td>
-                  <td className="px-4 py-3">Bianchi</td>
-                  <td className="px-4 py-3">348 7654321</td>
+                  <td className="px-7 py-3">Bianchi</td>
+                  <td className="px-8 py-3">15/06/1973</td>
+                  <td className="px-2 py-3">348 7654321</td>
                   <td className="px-4 py-3">Comune</td>
+                  <td className="px-18 py-3">Asporto</td>
+                  <td className="px-13 py-3">Si</td>
                 </tr>
               </tbody>
             </table>
