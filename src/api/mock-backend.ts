@@ -4,7 +4,14 @@ import type {
   user,
 } from "../types/piuzuppa"
 
-const mockUsers: user[] = [
+const STORAGE_KEY = "piuzuppa_users";
+
+const getInitialUsers = (): user[] => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [
   {
     nomeECognome: "Irene Ruscelli",
     username: "irene.ruscelli",
@@ -38,6 +45,12 @@ const mockUsers: user[] = [
       ruoli: ["magazzino"]
   }
 ]
+}
+
+let activeUsers: user[] = getInitialUsers();
+const syncToStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(activeUsers));
+};
 type NewUserInput = {
   nomeECognome: user["nomeECognome"]
   username: user["username"]
@@ -63,8 +76,9 @@ export function addNewUser({
     puntiDistribuzione,
     ruoli,
   }
-
-  mockUsers.push(newUser)
+  activeUsers.push(newUser);
+  syncToStorage()
+  console.log(activeUsers);
 }
 
 
@@ -78,15 +92,10 @@ export async function verifyCredentials(
   password: string,
 ): Promise<VerifyCredentialsResult> {
   const userWithUsername =
-    mockUsers.find((mockUser) => mockUser.username === username) ?? null
+    activeUsers.find((u) => u.username === username) ?? null;
 
-  if (!userWithUsername) {
-    return { status: "username-error" }
-  }
+  if (!userWithUsername) return { status: "username-error" };
+  if (userWithUsername.password !== password) return { status: "password-error" };
 
-  if (userWithUsername.password !== password) {
-    return { status: "password-error" }
-  }
-
-  return { status: "success", user: userWithUsername }
+  return { status: "success", user: userWithUsername };
 }
