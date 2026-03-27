@@ -5,6 +5,7 @@ import type {
   Ruolo,
   user,
 } from "../types/piuzuppa"
+import { Eye, EyeOff } from "lucide-react"
 
 export function NuovoUtente() {
     const [nameAndSurname, setNameAndSurname] = useState("")
@@ -14,6 +15,7 @@ export function NuovoUtente() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [passwordConfirm, setPasswordConfirm] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
     
     const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
   if (list.includes(value)) {
@@ -67,20 +69,45 @@ export function NuovoUtente() {
         </div>
 
         <div className="flex flex-col gap-1">
+          
           <label className="text-bianco text-sm">Password:</label>
-          <input 
-          onChange={(event) => setPassword(event.target.value)}
-          value={password}
-          id="password" type="password" placeholder="password" className="border-2 bg-sabbia border-bordeaux rounded-md px-2 h-10 outline-none" />
+          <div className="flex justify-between gap-4">
+            <input 
+              onChange={(event) => setPassword(event.target.value)}
+              value={password}
+              id="password" type={showPassword ? "text" : "password"} 
+              placeholder="password" className="border-2 bg-sabbia border-bordeaux rounded-md w-full px-2 h-10 outline-none" />
+          <button
+                type="button"
+                onClick={() => setShowPassword((currentValue) => !currentValue)}
+                className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-bordeaux bg-sabbia text-bordeaux hover:bg-giallo"
+                aria-label={
+                  showPassword ? "Nascondi password" : "Mostra password"
+                }>
+                {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
+              </button></div>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-bianco text-sm">Conderma la password:</label>
-          <input 
+          <div className="flex justify-between gap-4">
+            <input 
           onChange={(event) => setPasswordConfirm(event.target.value)}
           value={passwordConfirm}
-          id="passwordConfirm" type="password" placeholder="password" className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          id="passwordConfirm" type={showPassword ? "text" : "password"} placeholder="password" 
+          className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 w-full outline-none" />
+        <button
+          type="button"
+          onClick={() => setShowPassword((currentValue) => !currentValue)}
+          className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-bordeaux bg-sabbia text-bordeaux hover:bg-giallo"
+          aria-label={
+            showPassword ? "Nascondi password" : "Mostra password"
+          }>
+          {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
+        </button>
+          </div>
+          
         </div>
-
+          
         <div className="flex flex-col gap-3">
           <label className="text-bianco text-sm font-semibold">Livello di accesso:</label>
           <div className="flex gap-6">
