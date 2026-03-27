@@ -7,7 +7,7 @@ export function AnagraficaOspite() {
         backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)`, 
       }}
     >
-      <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
+      <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Ospite</h1>
       
       <form className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
         {/* Row 1 */}

@@ -26,7 +26,7 @@ export function Login() {
     }
 
     setErrorMessage("")
-    setSuccessMessage(`Benvenuta/o ${result.user.nome}`)
+    setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome}`)
     setUsername("")
     setPassword("")
   }

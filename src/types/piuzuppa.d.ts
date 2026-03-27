@@ -1,12 +1,15 @@
 export type user = {
-nome:string,
-cognome:string,
+nomeECognome:string,
 username:string,
 password:string,
 livelloAccesso: "volontario" | "coordinatore",
-puntoDistribuzione:"saffi" | "battiferro" | "sandonato" | "savena",
-ruolo: "cucina" | "magazzino" | "accoglienza"
+puntiDistribuzione: PuntoDiDistribuzione[]
+ruoli: Ruolo[]
 }
+
+type PuntoDiDistribuzione = "saffi" | "battiferro" | "sandonato" | "savena"
+
+type Ruolo = "cucina" | "magazzino" | "accoglienza"
 
 export type ospite = {
     nome: string,
