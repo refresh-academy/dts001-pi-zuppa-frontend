@@ -5,6 +5,7 @@ import { Sidebar } from "./components/sidebar"
 import { Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { AnagraficaOspite } from "./components/GestioneAnagrafiche"
+import { AnagraficaUtenti } from "./components/GestioneUtenti"
 
 const sidebarItems: SidebarConfig[] = [
   {
@@ -60,13 +61,24 @@ function App() {
             element={
               <>
                 <Navbar />
-                <div className="flex">
+                <div className="flex mr-4">
                 <Sidebar sidebarItems={sidebarItems} />
                 <AnagraficaOspite />
                 </div>
               </>
             }
           />
+          <Route
+            path="utenti"
+            element={
+              <>
+                <Navbar />
+                <div className="flex mr-4">
+                <Sidebar sidebarItems={sidebarItems} />
+                <AnagraficaUtenti />
+                </div>
+              </>
+            }/>
         {/* <Route path='' element = {<Login/>}/>
        
        <Route path='Forse' element = {<Forse/>}/>

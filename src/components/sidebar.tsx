@@ -27,7 +27,7 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
       </NavLink>
 
       {subItems && (
-        <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-50 min-w-[240px]">
+        <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-50 min-w-60">
           <div 
             className="p-4 rounded-xs border-8 border-y-amber-900 border-x-amber-800 shadow-2xl"
             style={{
