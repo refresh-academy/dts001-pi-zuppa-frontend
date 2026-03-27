@@ -1,4 +1,8 @@
-import type { PuntoDiDistribuzione, Ruolo, user } from "../types/piuzuppa"
+import type {
+  PuntoDiDistribuzione,
+  Ruolo,
+  user,
+} from "../types/piuzuppa"
 
 const mockUsers: user[] = [
   {
@@ -34,24 +38,33 @@ const mockUsers: user[] = [
       ruoli: ["magazzino"]
   }
 ]
-export function addNewUser (
-  newNomeECognome: string, 
-  newUsername: string, 
-  newPassword: string, 
-  newLivelloAccesso: string, 
-  newPuntiDistribuzione: PuntoDiDistribuzione[], 
-  newRuoli: Ruolo[]) {
-  
-  const newUser: user = {
-    nomeECognome: newNomeECognome,
-    username: newUsername,
-    password: newPassword,
-    livelloAccesso: newLivelloAccesso as any,
-    puntiDistribuzione: newPuntiDistribuzione,
-    ruoli: newRuoli
-  };
+type NewUserInput = {
+  nomeECognome: user["nomeECognome"]
+  username: user["username"]
+  password: user["password"]
+  livelloAccesso: user["livelloAccesso"]
+  puntiDistribuzione: PuntoDiDistribuzione[]
+  ruoli: Ruolo[]
+}
 
-  mockUsers.push(newUser); 
+export function addNewUser({
+  nomeECognome,
+  username,
+  password,
+  livelloAccesso,
+  puntiDistribuzione,
+  ruoli,
+}: NewUserInput) {
+  const newUser: user = {
+    nomeECognome,
+    username,
+    password,
+    livelloAccesso,
+    puntiDistribuzione,
+    ruoli,
+  }
+
+  mockUsers.push(newUser)
 }
 
 

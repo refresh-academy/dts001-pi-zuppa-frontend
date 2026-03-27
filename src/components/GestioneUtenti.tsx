@@ -1,12 +1,16 @@
 import { addNewUser } from "../api/mock-backend"
 import { FormEvent, useState } from "react"
-import { PuntoDiDistribuzione, Ruolo } from "../types/piuzuppa"
+import type {
+  PuntoDiDistribuzione,
+  Ruolo,
+  user,
+} from "../types/piuzuppa"
 
 export function AnagraficaUtenti() {
     const [nameAndSurname, setNameAndSurname] = useState("")
-    const [accessLevel, setAccessLevel] = useState("")
-    const [site, setSite] = useState<string[]>([])
-    const [role, setRole] = useState<string[]>([])
+    const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">("")
+    const [site, setSite] = useState<PuntoDiDistribuzione[]>([])
+    const [role, setRole] = useState<Ruolo[]>([])
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [passwordConfirm, setPasswordConfirm] = useState("")
@@ -20,16 +24,18 @@ export function AnagraficaUtenti() {
 };
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        if (password === passwordConfirm) {
-            addNewUser (
-              nameAndSurname,
-              username, 
-              password, 
-              accessLevel, 
-              site, 
-              role)
-        }
         event.preventDefault()
+
+        if (password === passwordConfirm && accessLevel) {
+            addNewUser({
+              nomeECognome: nameAndSurname,
+              username,
+              password,
+              livelloAccesso: accessLevel,
+              puntiDistribuzione: site,
+              ruoli: role,
+            })
+        }
     }
 
   return (
@@ -42,7 +48,7 @@ export function AnagraficaUtenti() {
     >
       <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
       
-      <form className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
         <div className="flex flex-col gap-1">
           <label className="text-bianco text-sm">Nome e Cognome:</label>
           <input 
@@ -83,7 +89,9 @@ export function AnagraficaUtenti() {
                 <div className="relative flex items-center justify-center">
                   <input 
                     id="accessLevel"
-                    onChange={(event) => setAccessLevel(event.target.value)}
+                    onChange={(event) =>
+                      setAccessLevel(event.target.value as user["livelloAccesso"])
+                    }
                     type="radio" 
                     name="accessLevel"
                     value={option}

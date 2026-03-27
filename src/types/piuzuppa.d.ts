@@ -7,9 +7,13 @@ puntiDistribuzione: PuntoDiDistribuzione[]
 ruoli: Ruolo[]
 }
 
-type PuntoDiDistribuzione = "Saffi" | "Battiferro" | "San Donato" | "Savena"
+export type PuntoDiDistribuzione =
+    | "Saffi"
+    | "Battiferro"
+    | "San Donato"
+    | "Savena"
 
-type Ruolo = "cucina" | "magazzino" | "accoglienza"
+export type Ruolo = "cucina" | "magazzino" | "accoglienza"
 
 export type ospite = {
     nome: string,
