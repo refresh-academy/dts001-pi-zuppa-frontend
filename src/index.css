@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Chalkfont'; /* Use font-family to name it, not font-display */
+  font-family: 'Chalkfont'; 
   src: url('assets/Virgil.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
@@ -9,7 +9,6 @@
 }
 
 @theme {
-  /* This creates the .font-chalk utility class */
   --font-chalk: "Chalkfont", system-ui, sans-serif;
 
   --color-salvia: #c9e9d9;
@@ -32,7 +31,6 @@ body {
     linear-gradient(180deg, var(--color-bianco) 0%, var(--color-salvia) 58%, var(--color-sabbia) 100%);
   color: #1f2937;
   
-  /* Apply your theme font variable here */
   font-family: var(--font-chalk);
 }
 
