@@ -6,45 +6,55 @@ import type {
 
 const STORAGE_KEY = "piuzuppa_users";
 
- export const getInitialUsers = (): user[] => {
+function delay() : Promise<void> {
+    return new Promise(
+        (resolve) => setTimeout(resolve, 100)
+    )
+}
+
+export const getInitialUsers = (): user[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     return JSON.parse(saved);
   }
   return [
-  {
-    nomeECognome: "Irene Ruscelli",
-    username: "irene.ruscelli",
-    password: "1312Izzy<32024Lea",
-    livelloAccesso: "volontario",
-    puntiDistribuzione: ["Saffi"],
-    ruoli: ["cucina"]
-  },
-  {
+    {
+      nomeECognome: "Irene Ruscelli",
+      username: "irene.ruscelli",
+      password: "1312Izzy<32024Lea",
+      livelloAccesso: "volontario",
+      puntiDistribuzione: ["Saffi"],
+      ruoli: ["cucina"],
+      id: "86054924-ee75-4cd8-8b48-2a6ab05f1272"
+    },
+    {
       nomeECognome: "Svetlana Vitu",
       username: "svetty",
       password: "panda",
       livelloAccesso: "coordinatore",
       puntiDistribuzione: ["Savena"],
-      ruoli: ["cucina"]
-  },
-  {
+      ruoli: ["cucina"],
+      id: "879e2cb0-6c05-4d87-bddd-ca663148aaa4"
+    },
+    {
       nomeECognome: "Simone Querzoli",
       username: "Paddington",
       password: "fabrizioèuncornuto",
       livelloAccesso: "volontario",
       puntiDistribuzione: ["San Donato"],
-      ruoli: ["magazzino"]
-  },
-  {
+      ruoli: ["magazzino"],
+      id: "8e640d53-6cd0-4bc9-9ee7-0576420db546"
+    },
+    {
       nomeECognome: "Nicolas Carotenuto",
       username: "Niko.car",
       password: "overwatch",
       livelloAccesso: "coordinatore",
       puntiDistribuzione: ["Battiferro"],
-      ruoli: ["magazzino"]
-  }
-]
+      ruoli: ["magazzino"],
+      id: "3c9ecea5-04e1-41cb-94cc-ad5e45eef900"
+    }
+  ]
 }
 
 let activeUsers: user[] = getInitialUsers();
@@ -60,7 +70,7 @@ type NewUserInput = {
   ruoli: Ruolo[]
 }
 
-export function addNewUser({
+export async function addNewUser({
   nomeECognome,
   username,
   password,
@@ -68,6 +78,7 @@ export function addNewUser({
   puntiDistribuzione,
   ruoli,
 }: NewUserInput) {
+  await delay();
   const newUser: user = {
     nomeECognome,
     username,
@@ -75,12 +86,56 @@ export function addNewUser({
     livelloAccesso,
     puntiDistribuzione,
     ruoli,
+    id: crypto.randomUUID().toString()
   }
   activeUsers.push(newUser);
   syncToStorage()
   console.log(activeUsers);
 }
 
+export async function searchUsersByName(searchTerm: string): Promise<user[]> {
+  await delay();
+  
+  const normalizedSearch = searchTerm.toLowerCase().trim();
+  
+  if (!normalizedSearch) return activeUsers;
+
+  return activeUsers.filter(u => 
+    u.nomeECognome.toLowerCase().includes(normalizedSearch)
+  );
+}
+
+export async function fetchUserToChange(targetId: string): Promise<user | undefined> {
+  await delay();
+  const userToChange= activeUsers.find(u => u.id === targetId);
+  return userToChange
+
+}
+
+export async function changeUser(
+  idUtente: string,
+  nuovoNomeECognome: string,
+  nuovoUsername: string,
+  nuovaPassword: string,
+  nuovoLivelloAccesso: "volontario" | "coordinatore",
+  nuoviPuntiDistribuzione: PuntoDiDistribuzione[],
+  nuoviRuoli: Ruolo[]
+): Promise<user[]> {
+  await delay();
+  activeUsers = activeUsers.map(u => u.id === idUtente ? {
+    ...u, 
+    nomeECognome: nuovoNomeECognome,
+    username: nuovoUsername,
+    password: nuovaPassword,
+    livelloAccesso: nuovoLivelloAccesso,
+    puntiDistribuzione: nuoviPuntiDistribuzione,
+    ruoli: nuoviRuoli,
+  } : u);
+
+  syncToStorage();
+  console.log("Updated activeUsers:", activeUsers);
+  return activeUsers;
+}
 
 export type VerifyCredentialsResult =
   | { status: "success"; user: user }
