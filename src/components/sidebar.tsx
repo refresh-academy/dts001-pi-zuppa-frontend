@@ -40,7 +40,6 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
             <ul className="space-y-3">
               {subItems.map((sub, i) => (
                 <li key={i} className="flex items-center gap-2 group/sub">
-                   {/* Mini chalky white asterisk for the sub-menu */}
                    <span className="text-giallo">*</span>
                    <NavLink 
                     to={`/${sub.path}`}
