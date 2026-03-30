@@ -8,7 +8,7 @@ import { NuovoOspite } from "./components/NuovoOspite"
 import {  NuovoUtente } from "./components/NuovoUtente"
 import { AnagraficaOspite, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
-import { AnagraficaUtenti } from "./components/AnagraficaUtenti"
+import { GestioneUtenti } from "./components/GestioneUtenti"
 import { Tendone } from "./components/Tendone-bar"
 
 const sidebarItems: SidebarConfig[] = [
@@ -115,7 +115,7 @@ function App() {
                 <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
-                  <AnagraficaUtenti />
+                  <GestioneUtenti />
                 </div>
               </>
             }/>
@@ -130,13 +130,6 @@ function App() {
                 </div>
                 </>
             }/>
-                
-        {/* <Route path='' element = {<Login/>}/>
-       
-       <Route path='Forse' element = {<Forse/>}/>
-        <Route path='Archivio' element = {<Archivio/>}/>
-        <Route path='Attesa' element = {<Attesa/>}/>
-           <Route path='Cestino' element = {<Cestino/>}/>  */}
         </Routes>
       </main>
     </>
