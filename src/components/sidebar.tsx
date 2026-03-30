@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import type { SidebarConfig } from "../types/piuzuppa";
-import logo from "../assets/logo.png"
+import logo from "../assets/logo2.png"
 
 type SidebarItemProps = {
   path: string;
@@ -91,7 +91,7 @@ export const Sidebar = ({ sidebarItems }: SidebarProps) => {
           />
         ))}
       </ul>
-      <img src={logo} className="w-60 pt-20" alt="Più Zuppa" />
+      <img src={logo} className="p-2 w-50 pt-20" alt="Più Zuppa" />
     </div>
   );
 };
