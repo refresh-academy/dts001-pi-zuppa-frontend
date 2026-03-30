@@ -9,6 +9,7 @@ import {  NuovoUtente } from "./components/NuovoUtente"
 import { AnagraficaOspite, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { AnagraficaUtenti } from "./components/AnagraficaUtenti"
+import { Tendone } from "./components/Tendone-bar"
 
 const sidebarItems: SidebarConfig[] = [
   {
@@ -63,7 +64,7 @@ function App() {
             path="home"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <Sidebar sidebarItems={sidebarItems} />
               </>
             }
@@ -72,7 +73,7 @@ function App() {
             path="anagrafiche"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
                   <AnagraficaOspite />
@@ -85,7 +86,7 @@ function App() {
             path="nuovo-ospite"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
                   <NuovoOspite />
@@ -98,7 +99,7 @@ function App() {
             path="nuovo-utente"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
                   <NuovoUtente />
@@ -111,7 +112,7 @@ function App() {
             path="utenti"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
                   <AnagraficaUtenti />
@@ -122,7 +123,7 @@ function App() {
             path="magazzino"
             element={
               <>
-                <Navbar />
+                <Tendone />
                 <div className="flex mr-4">
                   <Sidebar sidebarItems={sidebarItems} />
                   <GestioneMagazzino />
