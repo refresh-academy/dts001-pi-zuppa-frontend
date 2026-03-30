@@ -1,0 +1,196 @@
+import { addNewUser, changeUser } from "../api/mock-backend"
+import { FormEvent, useState } from "react"
+import type {
+  PuntoDiDistribuzione,
+  Ruolo,
+  user,
+} from "../types/piuzuppa"
+import { Eye, EyeOff } from "lucide-react"
+
+export function ModificaUtente(
+    userToChange: user) {
+    const [nameAndSurname, setNameAndSurname] = useState(userToChange.nomeECognome)
+    const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">(userToChange.livelloAccesso)
+    const [site, setSite] = useState<PuntoDiDistribuzione[]>(userToChange.puntiDistribuzione)
+    const [role, setRole] = useState<Ruolo[]>(userToChange.ruoli)
+    const [username, setUsername] = useState(userToChange.username)
+    const [password, setPassword] = useState(userToChange.password)
+    const [passwordConfirm, setPasswordConfirm] = useState(userToChange.password)
+    const [showPassword, setShowPassword] = useState(false)
+    
+    const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
+  if (list.includes(value)) {
+    setter(list.filter((item) => item !== value));
+  } else {
+    setter([...list, value]);
+  }
+};
+
+    async function handleChange(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+
+        if (password === passwordConfirm && accessLevel) {
+            changeUser(
+              userToChange.id,
+              nameAndSurname,
+              username,
+              password,
+              accessLevel,
+              site,
+              role,
+            )
+        }
+    }
+
+  return (
+    <div 
+      className="top-0 ml-4 mt-6 min-h-[60vh] w-full rounded-2xl border-12 border-y-amber-900  border-x-amber-800 py-8 pr-8 shadow-2xl bg-amber-950" 
+      style={{ 
+        backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)`, 
+      }}
+    >
+      <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
+      
+      <form onSubmit={handleChange} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Nome e Cognome:</label>
+          <input 
+            id="nameAndSurname"
+            onChange={(event) => setNameAndSurname(event.target.value)} 
+            type="text" placeholder={userToChange.nomeECognome}
+            value={nameAndSurname}
+            className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Nome Utente:</label>
+          <input 
+            onChange={(event) => setUsername(event.target.value)}
+            value={username}
+            id="username" type="text" placeholder={userToChange.username} className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          
+          <label className="text-bianco text-sm">Password:</label>
+          <div className="flex justify-between gap-4">
+            <input 
+              onChange={(event) => setPassword(event.target.value)}
+              value={password}
+              id="password" type={showPassword ? "text" : "password"} 
+              placeholder={userToChange.password} className="border-2 bg-sabbia border-bordeaux rounded-md w-full px-2 h-10 outline-none" />
+          <button
+                type="button"
+                onClick={() => setShowPassword((currentValue) => !currentValue)}
+                className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-bordeaux bg-sabbia text-bordeaux hover:bg-giallo"
+                aria-label={
+                  showPassword ? "Nascondi password" : "Mostra password"
+                }>
+                {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
+              </button></div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Conderma la password:</label>
+          <div className="flex justify-between gap-4">
+            <input 
+          onChange={(event) => setPasswordConfirm(event.target.value)}
+          value={passwordConfirm}
+          id="passwordConfirm" type={showPassword ? "text" : "password"} placeholder={userToChange.password}
+          className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 w-full outline-none" />
+        <button
+          type="button"
+          onClick={() => setShowPassword((currentValue) => !currentValue)}
+          className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-bordeaux bg-sabbia text-bordeaux hover:bg-giallo"
+          aria-label={
+            showPassword ? "Nascondi password" : "Mostra password"
+          }>
+          {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
+        </button>
+          </div>
+          
+        </div>
+          
+        <div className="flex flex-col gap-3">
+          <label className="text-bianco text-sm font-semibold">Livello di accesso:</label>
+          <div className="flex gap-6">
+            {['volontario', 'coordinatore'].map((option) => (
+              <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input 
+                    id="accessLevel"
+                    onChange={(event) =>
+                      setAccessLevel(event.target.value as user["livelloAccesso"])
+                    }
+                    
+                    type="radio" 
+                    name="accessLevel"
+                    value={option}
+                    checked={(userToChange.livelloAccesso === option)?true: false}
+                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                  />
+                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
+                  {option}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <label className="text-bianco text-sm font-semibold">Punto di distribuzione:</label>
+          <div className="flex gap-6">
+            {['Saffi', 'Battiferro', 'Savena', 'San Donato'].map((option) => (
+              <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input 
+                    checked={site.includes(option as PuntoDiDistribuzione)}
+                    onChange={() => toggleSelection(site, option as PuntoDiDistribuzione, setSite)}
+                    id="site"
+                    type="checkbox" 
+                    name="site"
+                    value={option}
+                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                  />
+                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
+                  {option}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+       <div className="flex flex-col gap-3">
+          <label className="text-bianco text-sm font-semibold">Ruolo:</label>
+          <div className="flex gap-6">
+            {['cucina', 'magazzino', 'accoglienza'].map((option) => (
+              <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input 
+                    checked={role.includes(option as Ruolo)}
+                    onChange={() => toggleSelection(role, option as Ruolo, setRole)}
+                    id="role"
+                    type="checkbox" 
+                    name="role"
+                    value={option}
+                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                  />
+                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
+                  {option}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <button type="submit" className="h-10 bg-amber-900 text-white font-bold rounded-md hover:bg-amber-800 transition-all shadow-lg active:scale-95">
+          CONFERMA MODIFICHE
+        </button>
+      </form>
+    </div>
+  );
+}
