@@ -1,7 +1,7 @@
 
 import { RicercaTabella } from "./RicercaTabella"
 
-export function AnagraficaOspite() {
+export function GestioneOspiti() {
   const columns = [
     "Nome",
     "Cognome",
@@ -17,5 +17,5 @@ export function AnagraficaOspite() {
     ["Anna", "Bianchi", "15/06/1973", "348 7654321", "Comune", "Asporto", "Si"],
   ]
 
-  return <RicercaTabella title="Cerca ospite" columns={columns} rows={rows} />
+  return <RicercaTabella title="Gestione Ospiti" columns={columns} rows={rows} />
 }

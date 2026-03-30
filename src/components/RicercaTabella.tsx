@@ -25,7 +25,7 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
 
       <form
         className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end"
-        onSubmit={(e) => e.preventDefault()} // Stops page reload on enter
+        onSubmit={(e) => e.preventDefault()}
       >
         <div className="flex w-full max-w-3xl flex-row items-center gap-4">
           <label className="text-lg font-bold text-bianco">Cerca per nome</label>
@@ -34,7 +34,7 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
               id="name"
               type="text"
               placeholder="nome"
-              onChange={(e) => onSearchChange(e.target.value)} // Now this works!
+              onChange={(e) => onSearchChange(e.target.value)}
               className="h-11 w-full rounded-xl border-2 border-bordeaux bg-sabbia pr-14 pl-4 font-chalk text-bordeaux shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)] outline-none placeholder:text-bordeaux/70 focus:border-amber-800"
             />
             <div className="pointer-events-none absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border border-amber-900 bg-giallo/80 text-bordeaux shadow-[0_2px_4px_rgba(0,0,0,0.2)]">
