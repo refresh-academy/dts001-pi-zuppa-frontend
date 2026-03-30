@@ -1,10 +1,11 @@
 export type user = {
-nomeECognome:string,
-username:string,
-password:string,
-livelloAccesso: "volontario" | "coordinatore",
-puntiDistribuzione: PuntoDiDistribuzione[]
-ruoli: Ruolo[]
+    id: string,
+    nomeECognome: string,
+    username: string,
+    password: string,
+    livelloAccesso: "volontario" | "coordinatore",
+    puntiDistribuzione: PuntoDiDistribuzione[]
+    ruoli: Ruolo[]
 }
 
 export type PuntoDiDistribuzione =
@@ -28,7 +29,7 @@ export type ospite = {
     pasti: Pasto[]
 }
 type Pasto = {
-    id: number, 
+    id: number,
     preferenzaAlimentare: "standard | vegetariano | vegano | halal"
 }
 
@@ -39,18 +40,18 @@ export type SidebarOption =
     | "cucina"
     | "accoglienza"
     | "utenti"
-    
 
-export type SidebarConfig ={
 
-  key: SidebarOption,
-  label:string,
-  path:string,
-  subItems?: {
+export type SidebarConfig = {
+
+    key: SidebarOption,
     label: string,
-    path: string
-  }[]
-  
-} 
-  
- 
+    path: string,
+    subItems?: {
+        label: string,
+        path: string
+    }[]
+
+}
+
+
