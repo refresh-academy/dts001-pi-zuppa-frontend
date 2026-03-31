@@ -27,7 +27,7 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
       </NavLink>
 
       {subItems && (
-        <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-50 min-w-60">
+        <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-[300] min-w-60">
           <div 
             className="p-4 rounded-xs border-8 border-y-amber-900 border-x-amber-800 shadow-2xl"
             style={{
@@ -68,7 +68,7 @@ type SidebarProps = {
 export const Sidebar = ({ sidebarItems }: SidebarProps) => {
   return (
     <div 
-      className="sticky top-0 ml-4 mt-6 min-h-[60vh] w-max rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 py-8 shadow-2xl"
+      className="sticky top-0 z-50 ml-4 mt-6 min-h-[60vh] w-max rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 py-8 shadow-2xl"
       style={{
         backgroundColor: "#0a0a0a",
         backgroundImage: `
