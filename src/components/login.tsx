@@ -3,9 +3,11 @@ import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { verifyCredentials } from "../api/mock-backend"
 import logo from "../assets/logo.png"
+import { useAuth } from "../components/authcontext"
 
 export function Login() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -17,24 +19,26 @@ export function Login() {
 
     const result = await verifyCredentials(username, password)
 
-    if (result.status === "username-error") {
+    if (result.status === "success") {
+      login(result.user) 
+
+      setErrorMessage("")
+      setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome} `)
+      navigate("/home")
+      setShowPassword(false)
+    }
+
+    else if (result.status === "username-error") {
       setSuccessMessage("")
       setErrorMessage("Nome utente non trovato")
       return
     }
 
-    if (result.status === "password-error") {
+    else if (result.status === "password-error") {
       setSuccessMessage("")
       setErrorMessage("Password non corretta")
       return
     }
-
-    setErrorMessage("")
-    setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome} `)
-    setUsername("")
-    setPassword("")
-    setShowPassword(false)
-    navigate("/home")
   }
 
   return (
