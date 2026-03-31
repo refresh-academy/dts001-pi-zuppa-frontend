@@ -1,5 +1,5 @@
 import { addNewUser } from "../api/mock-backend"
-import { FormEvent, useState } from "react"
+import { SubmitEvent, useState } from "react"
 import { useNavigate } from "react-router" 
 import type {
   PuntoDiDistribuzione,
@@ -27,7 +27,7 @@ export function NuovoUtente() {
   }
 };
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
         if (password === passwordConfirm && accessLevel) {
