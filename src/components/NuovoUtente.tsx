@@ -87,7 +87,7 @@ export function NuovoUtente() {
               </button></div>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Conderma la password:</label>
+          <label className="text-bianco text-sm">Conferma la password:</label>
           <div className="flex justify-between gap-4">
             <input 
           onChange={(event) => setPasswordConfirm(event.target.value)}

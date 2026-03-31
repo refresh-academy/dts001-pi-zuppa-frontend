@@ -31,7 +31,6 @@ body {
     linear-gradient(180deg, var(--color-bianco) 0%, var(--color-salvia) 58%, var(--color-sabbia) 100%);
   color: #1f2937;
   
-  font-family: var(--font-chalk);
 }
 
 #root {
