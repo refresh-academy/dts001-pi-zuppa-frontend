@@ -1,5 +1,6 @@
 import { Search } from "lucide-react"
 import { useState } from "react"
+import { useNavigate } from "react-router"
 
 type RicercaTabellaProps = {
   title: string
@@ -11,6 +12,7 @@ type RicercaTabellaProps = {
 
 export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }: RicercaTabellaProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -41,7 +43,10 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
               <Search size={16} strokeWidth={2.4} />
             </div>
           </div>
-          <button className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1">
+          <button 
+            type="button"
+            onClick={() => navigate("/nuovo-utente")}
+            className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1">
             Nuovo
           </button>
         </div>
