@@ -1,5 +1,6 @@
 import { addNewUser } from "../api/mock-backend"
 import { FormEvent, useState } from "react"
+import { useNavigate } from "react-router" 
 import type {
   PuntoDiDistribuzione,
   Ruolo,
@@ -16,6 +17,7 @@ export function NuovoUtente() {
     const [password, setPassword] = useState("")
     const [passwordConfirm, setPasswordConfirm] = useState("")
     const [showPassword, setShowPassword] = useState(false)
+    const navigate = useNavigate() 
     
     const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
   if (list.includes(value)) {
@@ -29,7 +31,7 @@ export function NuovoUtente() {
         event.preventDefault()
 
         if (password === passwordConfirm && accessLevel) {
-            addNewUser({
+            await addNewUser({
               nomeECognome: nameAndSurname,
               username,
               password,
@@ -37,7 +39,8 @@ export function NuovoUtente() {
               puntiDistribuzione: site,
               ruoli: role,
             })
-        }
+            navigate("/utenti"); 
+        } else {alert("Controlla che le password coincidano e che il livello di accesso sia selezionato.")}
     }
 
   return (
