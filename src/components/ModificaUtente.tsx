@@ -65,30 +65,32 @@ export function ModificaUtente({
       <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
       
       <form onSubmit={handleChange} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
-        <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Nome:</label>
-          <input 
-            id="name"
-            onChange={(event) => setName(event.target.value)} 
-            type="text" placeholder={userToChange.nome}
-            value={newName}
-            className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Cognome:</label>
-          <input 
-            id="surname"
-            onChange={(event) => setSurname(event.target.value)} 
-            type="text" placeholder={userToChange.cognome}
-            value={newSurname}
-            className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Nome Utente:</label>
-          <input 
-            onChange={(event) => setUsername(event.target.value)}
-            value={newUsername}
-            id="username" type="text" placeholder={userToChange.username} className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        <div className="col-span-2 grid grid-cols-3 gap-6">
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Nome:</label>
+            <input 
+              id="name"
+              onChange={(event) => setName(event.target.value)} 
+              type="text" placeholder={userToChange.nome}
+              value={newName}
+              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Cognome:</label>
+            <input 
+              id="surname"
+              onChange={(event) => setSurname(event.target.value)} 
+              type="text" placeholder={userToChange.cognome}
+              value={newSurname}
+              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Nome Utente:</label>
+            <input 
+              onChange={(event) => setUsername(event.target.value)}
+              value={newUsername}
+              id="username" type="text" placeholder={userToChange.username} className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">

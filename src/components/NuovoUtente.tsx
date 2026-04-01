@@ -9,7 +9,10 @@ import type {
 import { Eye, EyeOff } from "lucide-react"
 
 export function NuovoUtente() {
-    const [nameAndSurname, setNameAndSurname] = useState("")
+    const [name, setName] = useState("")
+    const [surname, setSurname] = useState("")
+    const [email, setEmail] = useState("")
+    const [phone, setPhone] = useState("")
     const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">("")
     const [site, setSite] = useState<PuntoDiDistribuzione[]>([])
     const [role, setRole] = useState<Ruolo[]>([])
@@ -32,7 +35,10 @@ export function NuovoUtente() {
 
         if (password === passwordConfirm && accessLevel) {
             await addNewUser({
-              nomeECognome: nameAndSurname,
+              nome: name,
+              cognome: surname,
+              telefono: phone,
+              email,
               username,
               password,
               livelloAccesso: accessLevel,
@@ -53,21 +59,49 @@ export function NuovoUtente() {
       <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
       
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
+        <div className="col-span-2 grid grid-cols-3 gap-6">
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Nome:</label>
+            <input 
+              id="name"
+              onChange={(event) => setName(event.target.value)} 
+              type="text" placeholder="nome" 
+              value={name}
+              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Cognome:</label>
+            <input 
+              id="surname"
+              onChange={(event) => setSurname(event.target.value)} 
+              type="text" placeholder="cognome" 
+              value={surname}
+              className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-bianco text-sm">Nome Utente:</label>
+            <input 
+              onChange={(event) => setUsername(event.target.value)}
+              value={username}
+              id="username" type="text" placeholder="scegli nome utente" className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Nome e Cognome:</label>
+          <label className="text-bianco text-sm">Telefono:</label>
           <input 
-            id="nameAndSurname"
-            onChange={(event) => setNameAndSurname(event.target.value)} 
-            type="text" placeholder="nome" 
-            value={nameAndSurname}
+            id="phone"
+            onChange={(event) => setPhone(event.target.value)} 
+            type="tel" placeholder="telefono"
+            value={phone}
             className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Nome Utente:</label>
+          <label className="text-bianco text-sm">Email:</label>
           <input 
-            onChange={(event) => setUsername(event.target.value)}
-            value={username}
-            id="username" type="text" placeholder="scegli nome utente" className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+            onChange={(event) => setEmail(event.target.value)}
+            value={email}
+            id="email" type="email" placeholder="email" className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
         </div>
 
         <div className="flex flex-col gap-1">
