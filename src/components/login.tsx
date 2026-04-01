@@ -23,7 +23,7 @@ export function Login() {
       login(result.user) 
 
       setErrorMessage("")
-      setSuccessMessage(`Benvenuta/o ${result.user.nomeECognome} `)
+      setSuccessMessage(`Benvenuta/o ${result.user.nome} ${result.user.cognome}`)
       navigate("/home")
       setShowPassword(false)
     }

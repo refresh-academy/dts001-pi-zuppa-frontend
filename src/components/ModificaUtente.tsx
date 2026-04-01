@@ -6,15 +6,17 @@ import type {
   user,
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
+import { useAuth } from "./AuthContext"
 
 type ModificaUtenteProps = user & {
-  onSave: () => void
+  onSave: (updatedUser: user) => void
 }
 
 export function ModificaUtente({
     onSave,
     ...userToChange
 }: ModificaUtenteProps) {
+    const { syncUser } = useAuth()
     const [newName, setName] = useState(userToChange.nome)
     const [newSurname, setSurname] = useState(userToChange.cognome)
     const [newEmail, setEmail] = useState(userToChange.email)
@@ -26,6 +28,13 @@ export function ModificaUtente({
     const [newPassword, setPassword] = useState(userToChange.password)
     const [passwordConfirm, setPasswordConfirm] = useState(userToChange.password)
     const [showPassword, setShowPassword] = useState(false)
+    const isFormValid =
+      Boolean(newName.trim()) &&
+      Boolean(newSurname.trim()) &&
+      Boolean(newUsername.trim()) &&
+      Boolean(newPassword) &&
+      newPassword === passwordConfirm &&
+      Boolean(newAccessLevel)
     
     const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
   if (list.includes(value)) {
@@ -38,8 +47,15 @@ export function ModificaUtente({
     async function handleChange(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        if (newPassword === passwordConfirm && newAccessLevel) {
-            await changeUser(
+        if (
+          newName.trim() &&
+          newSurname.trim() &&
+          newUsername.trim() &&
+          newPassword &&
+          newPassword === passwordConfirm &&
+          newAccessLevel !== ""
+        ) {
+            const updatedUser = await changeUser(
               userToChange.id,
               newName,
               newSurname,
@@ -51,7 +67,10 @@ export function ModificaUtente({
               newSite,
               newRole,
             )
-            onSave()
+            if (updatedUser) {
+              syncUser(updatedUser)
+              onSave(updatedUser)
+            }
         }
     }
 
@@ -165,7 +184,7 @@ export function ModificaUtente({
                     type="radio" 
                     name="accessLevel"
                     value={option}
-                    checked={(userToChange.livelloAccesso === option)?true: false}
+                    checked={newAccessLevel === option}
                     className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
                   />
                   <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
@@ -191,9 +210,11 @@ export function ModificaUtente({
                     type="checkbox" 
                     name="site"
                     value={option}
-                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
                   />
-                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
+                    ✓
+                  </div>
                 </div>
                 <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
                   {option}
@@ -216,9 +237,11 @@ export function ModificaUtente({
                     type="checkbox" 
                     name="role"
                     value={option}
-                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
                   />
-                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
+                    ✓
+                  </div>
                 </div>
                 <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
                   {option}
@@ -228,7 +251,11 @@ export function ModificaUtente({
           </div>
         </div>
 
-        <button type="submit" className="h-10 bg-amber-900 text-white font-bold rounded-md hover:bg-amber-800 transition-all shadow-lg active:scale-95">
+        <button
+          type="submit"
+          disabled={!isFormValid}
+          className="h-10 rounded-md font-bold text-white shadow-lg transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-amber-950 disabled:text-white/50 disabled:shadow-none enabled:bg-amber-900 enabled:hover:bg-amber-800"
+        >
           CONFERMA MODIFICHE
         </button>
       </form>

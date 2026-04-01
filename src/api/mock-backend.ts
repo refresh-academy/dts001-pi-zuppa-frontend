@@ -145,7 +145,7 @@ export async function changeUser(
   nuovoLivelloAccesso: "volontario" | "coordinatore",
   nuoviPuntiDistribuzione: PuntoDiDistribuzione[],
   nuoviRuoli: Ruolo[]
-): Promise<user[]> {
+): Promise<user | undefined> {
   await delay();
   activeUsers = activeUsers.map(u => u.id === idUtente ? {
     ...u, 
@@ -161,8 +161,9 @@ export async function changeUser(
   } : u);
 
   syncToStorage();
+  const updatedUser = activeUsers.find((u) => u.id === idUtente);
   console.log("Updated activeUsers:", activeUsers);
-  return activeUsers;
+  return updatedUser;
 }
 
 export type VerifyCredentialsResult =

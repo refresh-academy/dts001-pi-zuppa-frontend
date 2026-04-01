@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (userData: user) => void;
   logout: () => void;
   updateSite: (site: PuntoDiDistribuzione) => void;
+  syncUser: (updatedUser: user) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,8 +42,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("currentSite", site);
   };
 
+  const syncUser = (updatedUser: user) => {
+    setUser((currentUser) => {
+      if (!currentUser || currentUser.id !== updatedUser.id) {
+        return currentUser;
+      }
+
+      localStorage.setItem("activeUser", JSON.stringify(updatedUser));
+
+      const nextSite = updatedUser.puntiDistribuzione.includes(currentSite as PuntoDiDistribuzione)
+        ? currentSite
+        : updatedUser.puntiDistribuzione[0] ?? null;
+
+      setCurrentSite(nextSite);
+
+      if (nextSite) {
+        localStorage.setItem("currentSite", nextSite);
+      } else {
+        localStorage.removeItem("currentSite");
+      }
+
+      return updatedUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, currentSite, login, logout, updateSite }}>
+    <AuthContext.Provider value={{ user, currentSite, login, logout, updateSite, syncUser }}>
       {children}
     </AuthContext.Provider>
   );

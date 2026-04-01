@@ -9,6 +9,7 @@ import { ModificaUtente } from "./ModificaUtente";
 export function GestioneUtenti() {
   const [editingUser, setEditingUser] = useState<user | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
   const [filteredRows, setFilteredRows] = useState<{ id: string; data: string[] }[]>([]);
   const columns = [
     "Nome",
@@ -42,7 +43,7 @@ export function GestioneUtenti() {
     };
 
     fetchFiltered();
-  }, [searchTerm]);
+  }, [searchTerm, refreshKey]);
 
   const handleEdit = async (id: string) => {
     console.log("Editing user with ID:", id);
@@ -52,6 +53,7 @@ export function GestioneUtenti() {
 
   const handleSave = () => {
     setEditingUser(null);
+    setRefreshKey((currentValue) => currentValue + 1);
   };
 
   if (editingUser) {

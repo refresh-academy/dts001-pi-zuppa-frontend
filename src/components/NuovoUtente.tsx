@@ -21,6 +21,13 @@ export function NuovoUtente() {
     const [passwordConfirm, setPasswordConfirm] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate() 
+    const isFormValid =
+      Boolean(name.trim()) &&
+      Boolean(surname.trim()) &&
+      Boolean(username.trim()) &&
+      Boolean(password) &&
+      password === passwordConfirm &&
+      Boolean(accessLevel)
     
     const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
   if (list.includes(value)) {
@@ -33,7 +40,14 @@ export function NuovoUtente() {
     async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        if (password === passwordConfirm && accessLevel) {
+        if (
+          name.trim() &&
+          surname.trim() &&
+          username.trim() &&
+          password &&
+          password === passwordConfirm &&
+          accessLevel !== ""
+        ) {
             await addNewUser({
               nome: name,
               cognome: surname,
@@ -46,7 +60,7 @@ export function NuovoUtente() {
               ruoli: role,
             })
             navigate("/utenti"); 
-        } else {alert("Controlla che le password coincidano e che il livello di accesso sia selezionato.")}
+        } else {alert("Compila i campi obbligatori, seleziona il livello di accesso e controlla che le password coincidano.")}
     }
 
   return (
@@ -183,9 +197,11 @@ export function NuovoUtente() {
                     type="checkbox" 
                     name="site"
                     value={option}
-                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
                   />
-                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
+                    ✓
+                  </div>
                 </div>
                 <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
                   {option}
@@ -208,9 +224,11 @@ export function NuovoUtente() {
                     type="checkbox" 
                     name="role"
                     value={option}
-                    className="peer appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
                   />
-                  <div className="absolute w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
+                    ✓
+                  </div>
                 </div>
                 <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
                   {option}
@@ -220,7 +238,11 @@ export function NuovoUtente() {
           </div>
         </div>
 
-        <button type="submit" className="h-10 bg-amber-900 text-white font-bold rounded-md hover:bg-amber-800 transition-all shadow-lg active:scale-95">
+        <button
+          type="submit"
+          disabled={!isFormValid}
+          className="h-10 rounded-md font-bold text-white shadow-lg transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-amber-950 disabled:text-white/50 disabled:shadow-none enabled:bg-amber-900 enabled:hover:bg-amber-800"
+        >
           REGISTRA
         </button>
       </form>

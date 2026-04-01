@@ -82,7 +82,7 @@ export const Tendone = () => {
                
                 <div className="flex flex-row items-center gap-2">
                     <h1 className="font-extrabold bg-bordeaux px-4 py-1 mt-1 text-bianco text-shadow-2xs text-shadow-black">
-                        {user?.nomeECognome}
+                        {user ? `${user.nome} ${user.cognome}` : ""}
                     </h1>
                     <div className="relative mt-0.5">
                         <select
