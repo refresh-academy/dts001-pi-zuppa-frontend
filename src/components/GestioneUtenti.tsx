@@ -1,16 +1,13 @@
-
 import { fetchUserToChange, getInitialUsers, searchUsersByName } from "../api/mock-backend"
 import { useState, useEffect } from "react";
 
 import { RicercaTabella } from "./RicercaTabella"
-import { useNavigate } from "react-router";
 import { user } from "../types/piuzuppa";
 import { ModificaUtente } from "./ModificaUtente";
 
 
 export function GestioneUtenti() {
   const [editingUser, setEditingUser] = useState<user | null>(null);
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRows, setFilteredRows] = useState<{ id: string; data: string[] }[]>([]);
   const columns = [
@@ -47,8 +44,12 @@ export function GestioneUtenti() {
     if (user) setEditingUser(user);
   };
 
+  const handleSave = () => {
+    setEditingUser(null);
+  };
+
   if (editingUser) {
-    return <ModificaUtente {...editingUser} />;
+    return <ModificaUtente {...editingUser} onSave={handleSave} />;
   }
 
   return (

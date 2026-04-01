@@ -1,4 +1,4 @@
-import { addNewUser, changeUser } from "../api/mock-backend"
+import { changeUser } from "../api/mock-backend"
 import { SubmitEvent, useState } from "react"
 import type {
   PuntoDiDistribuzione,
@@ -7,8 +7,14 @@ import type {
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
 
-export function ModificaUtente(
-    userToChange: user) {
+type ModificaUtenteProps = user & {
+  onSave: () => void
+}
+
+export function ModificaUtente({
+    onSave,
+    ...userToChange
+}: ModificaUtenteProps) {
     const [nameAndSurname, setNameAndSurname] = useState(userToChange.nomeECognome)
     const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">(userToChange.livelloAccesso)
     const [site, setSite] = useState<PuntoDiDistribuzione[]>(userToChange.puntiDistribuzione)
@@ -30,7 +36,7 @@ export function ModificaUtente(
         event.preventDefault()
 
         if (password === passwordConfirm && accessLevel) {
-            changeUser(
+            await changeUser(
               userToChange.id,
               nameAndSurname,
               username,
@@ -39,6 +45,7 @@ export function ModificaUtente(
               site,
               role,
             )
+            onSave()
         }
     }
 
