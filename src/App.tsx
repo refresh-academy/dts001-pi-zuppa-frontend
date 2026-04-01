@@ -1,7 +1,7 @@
 import { Login } from "./components/login"
 import "./App.css"
 import { Sidebar } from "./components/sidebar"
-import { Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
 import {  NuovoUtente } from "./components/NuovoUtente"
@@ -9,6 +9,7 @@ import { GestioneOspiti, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { Tendone } from "./components/TopBar"
+import { useAuth } from "./components/AuthContext"
 
 const sidebarItems: SidebarConfig[] = [
   {
@@ -53,82 +54,120 @@ const sidebarItems: SidebarConfig[] = [
   },
 ]
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+
+  if (!user) {
+    return <Navigate to="/" replace />
+  }
+
+  return <>{children}</>
+}
+
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+
+  if (user) {
+    return <Navigate to="/home" replace />
+  }
+
+  return <>{children}</>
+}
+
 function App() {
   return (
     <>
       <main className="w-full">
         <Routes>
-          <Route index element={<Login />} />
+          <Route
+            index
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
           <Route
             path="home"
             element={
-              <>
-                <Tendone />
-                <Sidebar sidebarItems={sidebarItems} />
-              </>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <Sidebar sidebarItems={sidebarItems} />
+                </>
+              </ProtectedRoute>
             }
           />
           <Route
             path="anagrafiche"
             element={
-              <>
-                <Tendone />
-                <div className="flex mr-4">
-                  <Sidebar sidebarItems={sidebarItems} />
-                  <GestioneOspiti />
-                </div>
-              </>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneOspiti />
+                  </div>
+                </>
+              </ProtectedRoute>
             }
           />
           
           <Route
             path="nuovo-ospite"
             element={
-              <>
-                <Tendone />
-                <div className="flex mr-4">
-                  <Sidebar sidebarItems={sidebarItems} />
-                  <NuovoOspite />
-                  
-                </div>
-              </>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <NuovoOspite />
+                  </div>
+                </>
+              </ProtectedRoute>
             }
           />
            <Route
             path="nuovo-utente"
             element={
-              <>
-                <Tendone />
-                <div className="flex mr-4">
-                  <Sidebar sidebarItems={sidebarItems} />
-                  <NuovoUtente />
-                  
-                </div>
-              </>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <NuovoUtente />
+                  </div>
+                </>
+              </ProtectedRoute>
             }
           />
           <Route
             path="utenti"
             element={
-              <>
-                <Tendone />
-                <div className="flex mr-4">
-                  <Sidebar sidebarItems={sidebarItems} />
-                  <GestioneUtenti />
-                </div>
-              </>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneUtenti />
+                  </div>
+                </>
+              </ProtectedRoute>
             }/>
           <Route
             path="magazzino"
             element={
-              <>
-                <Tendone />
-                <div className="flex mr-4">
-                  <Sidebar sidebarItems={sidebarItems} />
-                  <GestioneMagazzino />
-                </div>
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneMagazzino />
+                  </div>
                 </>
+              </ProtectedRoute>
             }/>
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </>
