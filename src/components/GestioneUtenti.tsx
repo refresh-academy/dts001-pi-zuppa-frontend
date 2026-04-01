@@ -11,8 +11,11 @@ export function GestioneUtenti() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRows, setFilteredRows] = useState<{ id: string; data: string[] }[]>([]);
   const columns = [
-    "Nome e Cognome",
+    "Nome",
+    "Cognome",
     "Username",
+    "email",
+    "telefono",
     "Livello di accesso",
     "Punti di distribuzione",
     "Ruoli",
@@ -24,8 +27,11 @@ export function GestioneUtenti() {
       const tableData = users.map(u => ({
         id: u.id,
         data: [
-          u.nomeECognome, 
-          u.username, 
+          u.nome,
+          u.cognome,
+          u.username,
+          u.email,
+          u.telefono, 
           u.livelloAccesso,
           u.puntiDistribuzione.join(", "),
           u.ruoli.join(", ")

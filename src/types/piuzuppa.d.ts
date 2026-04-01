@@ -1,8 +1,11 @@
 export type user = {
     id: string,
-    nomeECognome: string,
+    nome: string,
+    cognome: string,
     username: string,
     password: string,
+    telefono: string,
+    email: string,
     livelloAccesso: "volontario" | "coordinatore",
     puntiDistribuzione: PuntoDiDistribuzione[]
     ruoli: Ruolo[]

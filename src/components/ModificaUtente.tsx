@@ -15,12 +15,15 @@ export function ModificaUtente({
     onSave,
     ...userToChange
 }: ModificaUtenteProps) {
-    const [nameAndSurname, setNameAndSurname] = useState(userToChange.nomeECognome)
-    const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">(userToChange.livelloAccesso)
-    const [site, setSite] = useState<PuntoDiDistribuzione[]>(userToChange.puntiDistribuzione)
-    const [role, setRole] = useState<Ruolo[]>(userToChange.ruoli)
-    const [username, setUsername] = useState(userToChange.username)
-    const [password, setPassword] = useState(userToChange.password)
+    const [newName, setName] = useState(userToChange.nome)
+    const [newSurname, setSurname] = useState(userToChange.cognome)
+    const [newEmail, setEmail] = useState(userToChange.email)
+    const [newPhone, setPhone] = useState(userToChange.telefono)
+    const [newAccessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">(userToChange.livelloAccesso)
+    const [newSite, setSite] = useState<PuntoDiDistribuzione[]>(userToChange.puntiDistribuzione)
+    const [newRole, setRole] = useState<Ruolo[]>(userToChange.ruoli)
+    const [newUsername, setUsername] = useState(userToChange.username)
+    const [newPassword, setPassword] = useState(userToChange.password)
     const [passwordConfirm, setPasswordConfirm] = useState(userToChange.password)
     const [showPassword, setShowPassword] = useState(false)
     
@@ -35,15 +38,18 @@ export function ModificaUtente({
     async function handleChange(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        if (password === passwordConfirm && accessLevel) {
+        if (newPassword === passwordConfirm && newAccessLevel) {
             await changeUser(
               userToChange.id,
-              nameAndSurname,
-              username,
-              password,
-              accessLevel,
-              site,
-              role,
+              newName,
+              newSurname,
+              newPhone,
+              newEmail,
+              newUsername,
+              newPassword,
+              newAccessLevel,
+              newSite,
+              newRole,
             )
             onSave()
         }
@@ -60,20 +66,46 @@ export function ModificaUtente({
       
       <form onSubmit={handleChange} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Nome e Cognome:</label>
+          <label className="text-bianco text-sm">Nome:</label>
           <input 
-            id="nameAndSurname"
-            onChange={(event) => setNameAndSurname(event.target.value)} 
-            type="text" placeholder={userToChange.nomeECognome}
-            value={nameAndSurname}
+            id="name"
+            onChange={(event) => setName(event.target.value)} 
+            type="text" placeholder={userToChange.nome}
+            value={newName}
+            className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Cognome:</label>
+          <input 
+            id="surname"
+            onChange={(event) => setSurname(event.target.value)} 
+            type="text" placeholder={userToChange.cognome}
+            value={newSurname}
             className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-bianco text-sm">Nome Utente:</label>
           <input 
             onChange={(event) => setUsername(event.target.value)}
-            value={username}
+            value={newUsername}
             id="username" type="text" placeholder={userToChange.username} className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Telefono:</label>
+          <input 
+            id="phone"
+            onChange={(event) => setPhone(event.target.value)} 
+            type="tel" placeholder={userToChange.nome}
+            value={newPhone}
+            className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-bianco text-sm">Email:</label>
+          <input 
+            onChange={(event) => setEmail(event.target.value)}
+            value={newEmail}
+            id="email" type="email" placeholder={userToChange.username} className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
         </div>
 
         <div className="flex flex-col gap-1">
@@ -82,7 +114,7 @@ export function ModificaUtente({
           <div className="flex justify-between gap-4">
             <input 
               onChange={(event) => setPassword(event.target.value)}
-              value={password}
+              value={newPassword}
               id="password" type={showPassword ? "text" : "password"} 
               placeholder={userToChange.password} className="border-2 bg-sabbia border-bordeaux rounded-md w-full px-2 h-10 outline-none" />
           <button
@@ -96,7 +128,7 @@ export function ModificaUtente({
               </button></div>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Conderma la password:</label>
+          <label className="text-bianco text-sm">Conferma la password:</label>
           <div className="flex justify-between gap-4">
             <input 
           onChange={(event) => setPasswordConfirm(event.target.value)}
@@ -151,8 +183,8 @@ export function ModificaUtente({
               <label key={option} className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative flex items-center justify-center">
                   <input 
-                    checked={site.includes(option as PuntoDiDistribuzione)}
-                    onChange={() => toggleSelection(site, option as PuntoDiDistribuzione, setSite)}
+                    checked={newSite.includes(option as PuntoDiDistribuzione)}
+                    onChange={() => toggleSelection(newSite, option as PuntoDiDistribuzione, setSite)}
                     id="site"
                     type="checkbox" 
                     name="site"
@@ -176,8 +208,8 @@ export function ModificaUtente({
               <label key={option} className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative flex items-center justify-center">
                   <input 
-                    checked={role.includes(option as Ruolo)}
-                    onChange={() => toggleSelection(role, option as Ruolo, setRole)}
+                    checked={newRole.includes(option as Ruolo)}
+                    onChange={() => toggleSelection(newRole, option as Ruolo, setRole)}
                     id="role"
                     type="checkbox" 
                     name="role"

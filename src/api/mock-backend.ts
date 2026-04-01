@@ -19,40 +19,52 @@ export const getInitialUsers = (): user[] => {
   }
   return [
     {
-      nomeECognome: "Irene Ruscelli",
+      nome: "Irene",
+      cognome: "Ruscelli",
       username: "irene.ruscelli",
       password: "1312Izzy<32024Lea",
       livelloAccesso: "volontario",
       puntiDistribuzione: ["Saffi"],
       ruoli: ["cucina"],
-      id: "86054924-ee75-4cd8-8b48-2a6ab05f1272"
+      id: "86054924-ee75-4cd8-8b48-2a6ab05f1272",
+      telefono: "",
+      email: ""
     },
     {
-      nomeECognome: "Svetlana Vitu",
+      nome: "Svetlana",
       username: "svetty",
       password: "panda",
       livelloAccesso: "coordinatore",
       puntiDistribuzione: ["Savena"],
       ruoli: ["cucina"],
-      id: "879e2cb0-6c05-4d87-bddd-ca663148aaa4"
+      id: "879e2cb0-6c05-4d87-bddd-ca663148aaa4",
+      cognome: " Vitu",
+      telefono: "",
+      email: ""
     },
     {
-      nomeECognome: "Simone Querzoli",
+      nome: "Simone",
       username: "Paddington",
       password: "fabrizioèuncornuto",
       livelloAccesso: "volontario",
       puntiDistribuzione: ["San Donato"],
       ruoli: ["magazzino"],
-      id: "8e640d53-6cd0-4bc9-9ee7-0576420db546"
+      id: "8e640d53-6cd0-4bc9-9ee7-0576420db546",
+      cognome: "Querzoli",
+      telefono: "",
+      email: ""
     },
     {
-      nomeECognome: "Nicolas Carotenuto",
+      nome: "Nicolas",
       username: "Niko.car",
       password: "overwatch",
       livelloAccesso: "coordinatore",
       puntiDistribuzione: ["Battiferro"],
       ruoli: ["magazzino"],
-      id: "3c9ecea5-04e1-41cb-94cc-ad5e45eef900"
+      id: "3c9ecea5-04e1-41cb-94cc-ad5e45eef900",
+      cognome: "Carotenuto",
+      telefono: "",
+      email: ""
     }
   ]
 }
@@ -61,8 +73,12 @@ let activeUsers: user[] = getInitialUsers();
 const syncToStorage = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(activeUsers));
 };
+
 type NewUserInput = {
-  nomeECognome: user["nomeECognome"]
+  nome: user["nome"]
+  cognome: user["cognome"]
+  email: user["email"]
+  telefono: user["telefono"]
   username: user["username"]
   password: user["password"]
   livelloAccesso: user["livelloAccesso"]
@@ -71,7 +87,10 @@ type NewUserInput = {
 }
 
 export async function addNewUser({
-  nomeECognome,
+  nome,
+  cognome,
+  telefono,
+  email,
   username,
   password,
   livelloAccesso,
@@ -80,7 +99,10 @@ export async function addNewUser({
 }: NewUserInput) {
   await delay();
   const newUser: user = {
-    nomeECognome,
+    nome,
+    cognome,
+    telefono,
+    email,
     username,
     password,
     livelloAccesso,
@@ -101,7 +123,7 @@ export async function searchUsersByName(searchTerm: string): Promise<user[]> {
   if (!normalizedSearch) return activeUsers;
 
   return activeUsers.filter(u => 
-    u.nomeECognome.toLowerCase().includes(normalizedSearch)
+    u.nome.toLowerCase().includes(normalizedSearch)
   );
 }
 
@@ -114,7 +136,10 @@ export async function fetchUserToChange(targetId: string): Promise<user | undefi
 
 export async function changeUser(
   idUtente: string,
-  nuovoNomeECognome: string,
+  nuovoNome: string,
+  nuovoCognome: string,
+  nuovoTelefono: string,
+  nuovaEmail: string,
   nuovoUsername: string,
   nuovaPassword: string,
   nuovoLivelloAccesso: "volontario" | "coordinatore",
@@ -124,7 +149,10 @@ export async function changeUser(
   await delay();
   activeUsers = activeUsers.map(u => u.id === idUtente ? {
     ...u, 
-    nomeECognome: nuovoNomeECognome,
+    nome: nuovoNome,
+    cognome: nuovoCognome,
+    telefono: nuovoTelefono,
+    email: nuovaEmail,
     username: nuovoUsername,
     password: nuovaPassword,
     livelloAccesso: nuovoLivelloAccesso,
