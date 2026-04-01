@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { verifyCredentials } from "../api/mock-backend"
 import logo from "../assets/logo.png"
-import { useAuth } from "../components/authcontext"
+import { useAuth } from "./AuthContext"
 
 export function Login() {
   const navigate = useNavigate()

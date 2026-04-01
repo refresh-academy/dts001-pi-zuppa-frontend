@@ -12,7 +12,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Initialize state from localStorage if it exists
   const [user, setUser] = useState<user | null>(() => {
     const saved = localStorage.getItem("activeUser");
     return saved ? JSON.parse(saved) : null;
@@ -25,7 +24,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (userData: user) => {
     setUser(userData);
-    // Default to the first site they have access to
     const defaultSite = userData.puntiDistribuzione[0];
     setCurrentSite(defaultSite);
     localStorage.setItem("activeUser", JSON.stringify(userData));

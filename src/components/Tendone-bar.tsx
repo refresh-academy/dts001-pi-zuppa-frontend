@@ -57,20 +57,16 @@ export const Tendone = () => {
                     className="h-12 w-auto brightness-0 invert drop-shadow-[0_2px_1px_rgba(0,0,0,0.8)] -skew-x-6"
                 />
 
-                {/* 1. The Hanging Ropes/Chains */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 flex justify-between w-20 px-2 h-4 z-0">
                     <div className="w-1 h-full bg-stone-700 shadow-sm" />
                     <div className="w-1 h-full bg-stone-700 shadow-sm" />
                 </div>
 
-                {/* 2. The Framed Sign */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-3 flex flex-col items-center 
                 bg-[#3d2b1f] p-1.5 rounded-xs border-8 border-x-amber-900 border-y-amber-800 shadow-2xl z-10">
 
-                    {/* 3. The Digital Screen (No Transparency) */}
                     <div className="bg-black px-4 py-1 border-2 border-stone-800 rounded-sm flex items-center gap-4">
 
-                        {/* Icon with a subtle "LED" glow */}
                         <span className="text-4xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
                             {weather.icon}
                         </span>
@@ -81,7 +77,6 @@ export const Tendone = () => {
                                 {weather.temp}°C
                             </span>
 
-                            {/* Subtext like an old LCD display */}
                             <span className="text-[14px] uppercase font-mono text-amber-700 font-bold tracking-widest mt-1">
                                 BOLOGNA: {weather.desc}
                             </span>
@@ -89,14 +84,12 @@ export const Tendone = () => {
                     </div>
                 </div>
                 <button className="bg-stone-800 text-white px-5 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider shadow-sm">
-                    Log in
+                    {user} - {currentSite}
                 </button>
             </div>
 
 
             <div className="w-full h-8 filter drop-shadow-[0_10px_8px_rgba(0,0,0,0.5)]">
-
-                {/* 2. The Scalloped Div (Moved inside the wrapper) */}
                 <div
                     className="w-full h-full"
                     style={{
