@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { verifyCredentials } from "../api/mock-backend"
@@ -14,7 +14,7 @@ export function Login() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const result = await verifyCredentials(username, password)

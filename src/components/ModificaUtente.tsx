@@ -1,5 +1,5 @@
 import { addNewUser, changeUser } from "../api/mock-backend"
-import { FormEvent, useState } from "react"
+import { SubmitEvent, useState } from "react"
 import type {
   PuntoDiDistribuzione,
   Ruolo,
@@ -26,7 +26,7 @@ export function ModificaUtente(
   }
 };
 
-    async function handleChange(event: FormEvent<HTMLFormElement>) {
+    async function handleChange(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
         if (password === passwordConfirm && accessLevel) {
