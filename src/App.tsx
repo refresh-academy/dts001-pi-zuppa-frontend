@@ -1,6 +1,5 @@
 import { Login } from "./components/login"
 import "./App.css"
-import { Navbar } from "./components/navbar"
 import { Sidebar } from "./components/sidebar"
 import { Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
@@ -9,7 +8,7 @@ import {  NuovoUtente } from "./components/NuovoUtente"
 import { GestioneOspiti, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
-import { Tendone } from "./components/Tendone-bar"
+import { Tendone } from "./components/TopBar"
 
 const sidebarItems: SidebarConfig[] = [
   {

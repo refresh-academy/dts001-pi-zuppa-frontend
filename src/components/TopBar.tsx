@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
+import { useNavigate } from "react-router";
+import { ChevronDown } from "lucide-react";
 import logolineare from "../assets/piùZuppa-logolineare.svg";
-import { useAuth } from "./AuthContext"; // 1. Import the hook
+import { useAuth } from "./AuthContext"; 
+import type { PuntoDiDistribuzione } from "../types/piuzuppa";
 
 export const Tendone = () => {
-    const { user, currentSite, logout } = useAuth(); // 2. Destructure what you need
+    const { user, currentSite, logout, updateSite } = useAuth(); 
+    const navigate = useNavigate();
     
     const stripeWidth = 60;
     const fullPattern = stripeWidth * 2;
@@ -37,6 +41,15 @@ export const Tendone = () => {
         fetchWeather();
     }, []);
 
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
+
+    const handleSiteChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        updateSite(event.target.value as PuntoDiDistribuzione);
+    };
+
     return (
         <header className="relative w-full z-50">
             <div
@@ -50,7 +63,7 @@ export const Tendone = () => {
                     className="h-12 w-auto brightness-0 invert drop-shadow-[0_2px_1px_rgba(0,0,0,0.8)] -skew-x-6"
                 />
 
-                {/* Weather Widget */}
+              
                 <div className="absolute left-1/2 -translate-x-1/2 top-3 flex flex-col items-center 
                 bg-[#3d2b1f] p-1.5 rounded-xs border-8 border-x-amber-900 border-y-amber-800 shadow-2xl z-10">
                     <div className="bg-black px-4 py-1 border-2 border-stone-800 rounded-sm flex items-center gap-4">
@@ -66,16 +79,40 @@ export const Tendone = () => {
                     </div>
                 </div>
 
-                {/* 3. Render User and Site info */}
-                <button 
-                    onClick={logout}
-                    className="bg-stone-800 text-white px-5 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider shadow-sm hover:bg-stone-700 transition-colors"
+               
+                <div className="flex flex-row items-center gap-2">
+                    <h1 className="font-extrabold bg-bordeaux px-4 py-1 mt-1 text-bianco text-shadow-2xs text-shadow-black">
+                        {user?.nomeECognome}
+                    </h1>
+                    <div className="relative mt-0.5">
+                        <select
+                            value={currentSite ?? ""}
+                            onChange={handleSiteChange}
+                            className="appearance-none rounded-full border-2 border-amber-950 bg-sabbia px-4 py-1.5 pr-11 text-sm font-bold text-bordeaux shadow-sm outline-none"
+                        >
+                            {user?.puntiDistribuzione.map((site) => (
+                                <option key={site} value={site}>
+                                    {site}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown
+                            size={18}
+                            strokeWidth={3}
+                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-bordeaux"
+                        />
+                    </div>
+                    <button 
+                    onClick={handleLogout}
+                    className="bg-stone-800 text-white mt-0.5 px-5 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider shadow-sm hover:bg-stone-700 transition-colors"
                 >
-                    {user?.nomeECognome || 'Guest'} - {currentSite || 'No Site'}
-                </button>
+                    Log out   
+                </button> 
+
+                </div>
             </div>
 
-            {/* Decorative bottom edge */}
+        
             <div className="w-full h-8 filter drop-shadow-[0_10px_8px_rgba(0,0,0,0.5)]">
                 <div
                     className="w-full h-full"
