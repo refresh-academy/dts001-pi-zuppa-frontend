@@ -7,7 +7,7 @@ type RicercaTabellaProps = {
   columns: string[]
   rows: { id: string; data: string[] }[]
   onSearchChange: (value: string) => void
-  onEdit: (id: string) => void
+  onEdit?: (id: string) => void
 }
 
 export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }: RicercaTabellaProps) {
@@ -49,6 +49,17 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
             className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1">
             Nuovo
           </button>
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => selectedId && onEdit(selectedId)}
+              disabled={!selectedId}
+              className={`rounded-xl border-2 px-6 py-2 font-bold shadow-[0_6px_0_0_#5c3417] transition duration-150 ${!selectedId ? 'border-amber-700 bg-amber-200 text-amber-900 opacity-80 shadow-[0_6px_0_0_#7c5a2b]' : 'border-amber-950 text-amber-950 hover:-translate-y-1 active:translate-y-1 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)]'
+                }`}
+            >
+              Modifica
+            </button>
+          )}
         </div>
       </form>
 
@@ -76,7 +87,11 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
                       type="checkbox"
                       className="h-5 w-5 accent-bordeaux"
                       checked={selectedId === row.id}
-                      onChange={() => setSelectedId(row.id)}
+                      onChange={() =>
+                        setSelectedId((currentId) =>
+                          currentId === row.id ? null : row.id
+                        )
+                      }
                     />
                   </td>
                   {row.data.map((cell, i) => (
@@ -87,17 +102,6 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div className="px-8 pt-6">
-        <button
-          onClick={() => selectedId && onEdit(selectedId)}
-          disabled={!selectedId}
-          className={`rounded-xl border-2 border-amber-950 px-6 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417] transition duration-150 ${!selectedId ? 'opacity-50 grayscale' : 'hover:-translate-y-1 active:translate-y-1 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)]'
-            }`}
-        >
-          Modifica
-        </button>
       </div>
     </div>
   )
