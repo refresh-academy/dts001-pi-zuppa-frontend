@@ -1,15 +1,15 @@
-import { changeUser } from "../api/mock-backend"
+import { modifyUser } from "../api/backend"
 import { SubmitEvent, useState } from "react"
 import type {
   PuntoDiDistribuzione,
   Ruolo,
-  user,
+  User,
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
 import { useAuth } from "./AuthContext"
 
-type ModificaUtenteProps = user & {
-  onSave: (updatedUser: user) => void
+type ModificaUtenteProps = User & {
+  onSave: (updatedUser: User) => void
 }
 
 export function ModificaUtente({
@@ -21,7 +21,7 @@ export function ModificaUtente({
     const [newSurname, setSurname] = useState(userToChange.cognome)
     const [newEmail, setEmail] = useState(userToChange.email)
     const [newPhone, setPhone] = useState(userToChange.telefono)
-    const [newAccessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">(userToChange.livelloAccesso)
+    const [newAccessLevel, setAccessLevel] = useState<User["livelloAccesso"] | "">(userToChange.livelloAccesso)
     const [newSite, setSite] = useState<PuntoDiDistribuzione[]>(userToChange.puntiDistribuzione)
     const [newRole, setRole] = useState<Ruolo[]>(userToChange.ruoli)
     const [newUsername, setUsername] = useState(userToChange.username)
@@ -55,17 +55,19 @@ export function ModificaUtente({
           newPassword === passwordConfirm &&
           newAccessLevel !== ""
         ) {
-            const updatedUser = await changeUser(
+            const updatedUser = await modifyUser(
+              {
+                name: newName,
+                surname: newSurname,
+                phone: newPhone,
+                email: newEmail,
+                username: newUsername,
+                password: newPassword,
+                accessLevel: newAccessLevel,
+                site: newSite,
+                role: newRole,
+              },
               userToChange.id,
-              newName,
-              newSurname,
-              newPhone,
-              newEmail,
-              newUsername,
-              newPassword,
-              newAccessLevel,
-              newSite,
-              newRole,
             )
             if (updatedUser) {
               syncUser(updatedUser)
@@ -178,7 +180,7 @@ export function ModificaUtente({
                   <input 
                     id="accessLevel"
                     onChange={(event) =>
-                      setAccessLevel(event.target.value as user["livelloAccesso"])
+                      setAccessLevel(event.target.value as User["livelloAccesso"])
                     }
                     
                     type="radio" 

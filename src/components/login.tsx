@@ -1,7 +1,7 @@
 import { useState, type SubmitEvent } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
-import { verifyCredentials } from "../api/mock-backend"
+import { verifyCredentials } from "../api/backend"
 import logo from "../assets/logo.png"
 import { useAuth } from "./AuthContext"
 

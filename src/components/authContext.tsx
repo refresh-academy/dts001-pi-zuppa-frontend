@@ -1,19 +1,19 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import type { user, PuntoDiDistribuzione } from "../types/piuzuppa";
+import type { User, PuntoDiDistribuzione } from "../types/piuzuppa";
 
 interface AuthContextType {
-  user: user | null;
+  user: User | null;
   currentSite: PuntoDiDistribuzione | null;
-  login: (userData: user) => void;
+  login: (userData: User) => void;
   logout: () => void;
   updateSite: (site: PuntoDiDistribuzione) => void;
-  syncUser: (updatedUser: user) => void;
+  syncUser: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<user | null>(() => {
+  const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem("activeUser");
     return saved ? JSON.parse(saved) : null;
   });
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (saved as PuntoDiDistribuzione) || null;
   });
 
-  const login = (userData: user) => {
+  const login = (userData: User) => {
     setUser(userData);
     const defaultSite = userData.puntiDistribuzione[0];
     setCurrentSite(defaultSite);
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("currentSite", site);
   };
 
-  const syncUser = (updatedUser: user) => {
+  const syncUser = (updatedUser: User) => {
     setUser((currentUser) => {
       if (!currentUser || currentUser.id !== updatedUser.id) {
         return currentUser;

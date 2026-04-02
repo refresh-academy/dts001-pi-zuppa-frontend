@@ -1,10 +1,10 @@
-import { addNewUser } from "../api/mock-backend"
 import { SubmitEvent, useState } from "react"
 import { useNavigate } from "react-router" 
+import { createUser } from "../api/backend"
 import type {
   PuntoDiDistribuzione,
   Ruolo,
-  user,
+  User,
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
 
@@ -13,7 +13,7 @@ export function NuovoUtente() {
     const [surname, setSurname] = useState("")
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")
-    const [accessLevel, setAccessLevel] = useState<user["livelloAccesso"] | "">("")
+    const [accessLevel, setAccessLevel] = useState<User["livelloAccesso"] | "">("")
     const [site, setSite] = useState<PuntoDiDistribuzione[]>([])
     const [role, setRole] = useState<Ruolo[]>([])
     const [username, setUsername] = useState("")
@@ -48,16 +48,16 @@ export function NuovoUtente() {
           password === passwordConfirm &&
           accessLevel !== ""
         ) {
-            await addNewUser({
-              nome: name,
-              cognome: surname,
-              telefono: phone,
-              email,
+            await createUser({
+              name,
+              surname,
+              phone,
               username,
               password,
-              livelloAccesso: accessLevel,
-              puntiDistribuzione: site,
-              ruoli: role,
+              email,
+              accessLevel,
+              site,
+              role
             })
             navigate("/utenti"); 
         } else {alert("Compila i campi obbligatori, seleziona il livello di accesso e controlla che le password coincidano.")}
@@ -167,7 +167,7 @@ export function NuovoUtente() {
                   <input 
                     id="accessLevel"
                     onChange={(event) =>
-                      setAccessLevel(event.target.value as user["livelloAccesso"])
+                      setAccessLevel(event.target.value as User["livelloAccesso"])
                     }
                     type="radio" 
                     name="accessLevel"
