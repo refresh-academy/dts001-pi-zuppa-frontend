@@ -43,25 +43,32 @@ function toArray<T>(value: T[] | T | null | undefined): T[] {
   return [value]
 }
 
-function normalizeUser(raw: any): User {
-  const puntiDistribuzione = toArray(
-    raw?.puntiDistribuzione ?? raw?.site
-  ) as PuntoDiDistribuzione[]
+function cleanPgArray(value: any): string[] {
+  if (typeof value !== "string") return toArray(value);
+  const cleaned = value.replace(/[{}"\\]/g, "").trim();
+  return cleaned === "" ? [] : cleaned.split(",").map(s => s.trim());
+}
 
-  const ruoli = toArray(raw?.ruoli ?? raw?.role) as Ruolo[]
+function normalizeUser(raw: any): User {
+  const puntiDistribuzione = cleanPgArray(
+    raw?.punto_distribuzione ?? raw?.puntiDistribuzione ?? raw?.site
+  ) as PuntoDiDistribuzione[];
+
+  const ruoli = cleanPgArray(raw?.ruolo ?? raw?.ruoli ?? raw?.role) as Ruolo[];
 
   return {
-    id: String(raw?.id ?? raw?._id ?? ""),
-    nome: String(raw?.nome ?? raw?.name ?? ""),
-    cognome: String(raw?.cognome ?? raw?.surname ?? ""),
+    id: String(raw?.id ?? ""),
+    nome: String(raw?.nome ?? ""),
+    cognome: String(raw?.cognome ?? ""),
     username: String(raw?.username ?? ""),
     password: String(raw?.password ?? ""),
-    telefono: String(raw?.telefono ?? raw?.phone ?? ""),
+    telefono: String(raw?.telefono ?? ""),
     email: String(raw?.email ?? ""),
-    livelloAccesso: (raw?.livelloAccesso ?? raw?.accessLevel ?? "volontario") as User["livelloAccesso"],
+    livelloAccesso: (raw?.livello_accesso ?? raw?.livelloAccesso ?? "volontario") as User["livelloAccesso"],
     puntiDistribuzione,
     ruoli,
-  }
+  };
+
 }
 
 function extractUsers(usersLoad: any): any[] {
@@ -93,8 +100,8 @@ export async function searchUsersByName(name: string): Promise<User[]> {
   const users = await getUsers();
   if (!name) return users;
   const lowerName = name.toLowerCase();
-  return users.filter(u => 
-    u.nome.toLowerCase().includes(lowerName) || 
+  return users.filter(u =>
+    u.nome.toLowerCase().includes(lowerName) ||
     u.cognome.toLowerCase().includes(lowerName)
   );
 }
