@@ -34,8 +34,8 @@ export function GestioneUtenti() {
           u.email,
           u.telefono,
           u.livelloAccesso,
-          (u.puntiDistribuzione || []).join(", "), 
-          (u.ruoli || []).join(", ")        
+          u.puntiDistribuzione.join(", "),
+          u.ruoli.join(", ")
         ]
       }));
 
