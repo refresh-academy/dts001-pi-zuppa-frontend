@@ -1,13 +1,13 @@
-import { fetchUserToChange, getInitialUsers, searchUsersByName } from "../api/mock-backend"
+import { fetchUserToChange, getInitialUsers, searchUsersByName } from "../api/backend"
 import { useState, useEffect } from "react";
 
 import { RicercaTabella } from "./RicercaTabella"
-import { user } from "../types/piuzuppa";
+import { User } from "../types/piuzuppa";
 import { ModificaUtente } from "./ModificaUtente";
 
 
 export function GestioneUtenti() {
-  const [editingUser, setEditingUser] = useState<user | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [filteredRows, setFilteredRows] = useState<{ id: string; data: string[] }[]>([]);
@@ -32,13 +32,13 @@ export function GestioneUtenti() {
           u.cognome,
           u.username,
           u.email,
-          u.telefono, 
+          u.telefono,
           u.livelloAccesso,
-          u.puntiDistribuzione.join(", "),
-          u.ruoli.join(", ")
+          (u.puntiDistribuzione || []).join(", "), 
+          (u.ruoli || []).join(", ")        
         ]
       }));
-      
+
       setFilteredRows(tableData);
     };
 
