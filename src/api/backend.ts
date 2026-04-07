@@ -88,3 +88,20 @@ export async function getUsers(): Promise<User[]> {
   const res = await api.get("/users")
   return extractUsers(res.data).map(normalizeUser)
 }
+
+export async function searchUsersByName(name: string): Promise<User[]> {
+  const users = await getUsers();
+  if (!name) return users;
+  const lowerName = name.toLowerCase();
+  return users.filter(u => 
+    u.nome.toLowerCase().includes(lowerName) || 
+    u.cognome.toLowerCase().includes(lowerName)
+  );
+}
+
+export async function fetchUserToChange(id: string): Promise<User | null> {
+  const users = await getUsers();
+  return users.find(u => u.id === id) ?? null;
+}
+
+export const getInitialUsers = getUsers;
