@@ -112,9 +112,13 @@ export async function getUsers(): Promise<User[]> {
 
 export async function searchUsersByName(name: string): Promise<User[]> {
   const users = await getUsers();
-  if (!name) return users;
+  const sortedUsers = [...users].sort((a, b) =>
+    a.nome.toLowerCase().localeCompare(b.nome.toLowerCase())
+  );
+
+  if (!name) return sortedUsers;
   const lowerName = name.toLowerCase();
-  return users.filter(u =>
+  return sortedUsers.filter(u =>
     u.nome.toLowerCase().includes(lowerName) ||
     u.cognome.toLowerCase().includes(lowerName)
   );

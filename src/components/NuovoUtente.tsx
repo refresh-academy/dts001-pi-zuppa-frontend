@@ -21,6 +21,8 @@ export function NuovoUtente() {
     const [passwordConfirm, setPasswordConfirm] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate() 
+    const passwordsDoNotMatch =
+      passwordConfirm.length > 0 && password !== passwordConfirm
     const isFormValid =
       Boolean(name.trim()) &&
       Boolean(surname.trim()) &&
@@ -158,6 +160,11 @@ export function NuovoUtente() {
           {showPassword ? <Eye size={16 } /> : <EyeOff size={16} />}
         </button>
           </div>
+          {passwordsDoNotMatch && (
+            <p className="text-lm font-semibold text-red-500">
+              Le password non coincidono.
+            </p>
+          )}
           
         </div>
           
