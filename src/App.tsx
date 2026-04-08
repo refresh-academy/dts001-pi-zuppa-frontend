@@ -1,6 +1,6 @@
-import { Login } from "./components/login"
+import { Login } from "./components/Login"
 import "./App.css"
-import { Sidebar } from "./components/sidebar"
+import { Sidebar } from "./components/Sidebar"
 import { Navigate, Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"

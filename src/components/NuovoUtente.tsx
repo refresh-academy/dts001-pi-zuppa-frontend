@@ -42,11 +42,11 @@ export function NuovoUtente() {
 
         if (
           name.trim() &&
-          surname.trim() &&
           username.trim() &&
           password &&
           password === passwordConfirm &&
-          accessLevel !== ""
+          accessLevel !== "" &&
+          (accessLevel === "coordinatore" || role.length > 0)
         ) {
             await createUser({
               name,
@@ -70,12 +70,15 @@ export function NuovoUtente() {
         backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)`, 
       }}
     >
-      <h1 className="text-giallo pl-8 text-2xl font-bold">Nuovo Utente</h1>
-      
+      <div className="flex flex-row gap-4 pl-8">
+        <h1 className="text-giallo  text-2xl font-bold">Nuovo Utente</h1>
+        <h2 className="text-bianco text-sm mt-2"> I campi contrassegnati con * sono obbligatori</h2>
+      </div>
+
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
         <div className="col-span-2 grid grid-cols-3 gap-6">
           <div className="flex flex-col gap-1">
-            <label className="text-bianco text-sm">Nome:</label>
+            <label className="text-bianco text-sm">Nome *</label>
             <input 
               id="name"
               onChange={(event) => setName(event.target.value)} 
@@ -84,7 +87,7 @@ export function NuovoUtente() {
               className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-bianco text-sm">Cognome:</label>
+            <label className="text-bianco text-sm">Cognome</label>
             <input 
               id="surname"
               onChange={(event) => setSurname(event.target.value)} 
@@ -93,7 +96,7 @@ export function NuovoUtente() {
               className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-bianco text-sm">Nome Utente:</label>
+            <label className="text-bianco text-sm">Nome Utente *</label>
             <input 
               onChange={(event) => setUsername(event.target.value)}
               value={username}
@@ -102,7 +105,7 @@ export function NuovoUtente() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Telefono:</label>
+          <label className="text-bianco text-sm">Telefono </label>
           <input 
             id="phone"
             onChange={(event) => setPhone(event.target.value)} 
@@ -120,7 +123,7 @@ export function NuovoUtente() {
 
         <div className="flex flex-col gap-1">
           
-          <label className="text-bianco text-sm">Password:</label>
+          <label className="text-bianco text-sm">Password * </label>
           <div className="flex justify-between gap-4">
             <input 
               onChange={(event) => setPassword(event.target.value)}
@@ -138,7 +141,7 @@ export function NuovoUtente() {
               </button></div>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Conferma la password:</label>
+          <label className="text-bianco text-sm">Conferma la password *</label>
           <div className="flex justify-between gap-4">
             <input 
           onChange={(event) => setPasswordConfirm(event.target.value)}
@@ -159,7 +162,7 @@ export function NuovoUtente() {
         </div>
           
         <div className="flex flex-col gap-3">
-          <label className="text-bianco text-sm font-semibold">Livello di accesso:</label>
+          <label className="text-bianco text-sm font-semibold">Livello di accesso *</label>
           <div className="flex gap-6">
             {['volontario', 'coordinatore'].map((option) => (
               <label key={option} className="flex items-center gap-3 cursor-pointer group">
@@ -185,7 +188,7 @@ export function NuovoUtente() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <label className="text-bianco text-sm font-semibold">Punto di distribuzione:</label>
+          <label className="text-bianco text-sm font-semibold">Punto di distribuzione *</label>
           <div className="flex gap-6">
             {['Saffi', 'Battiferro', 'Savena', 'San Donato'].map((option) => (
               <label key={option} className="flex items-center gap-3 cursor-pointer group">
@@ -212,7 +215,7 @@ export function NuovoUtente() {
         </div>
 
        <div className="flex flex-col gap-3">
-          <label className="text-bianco text-sm font-semibold">Ruolo:</label>
+          <label className="text-bianco text-sm font-semibold">Ruolo {accessLevel !== "coordinatore" ? "*" : ""}</label>
           <div className="flex gap-6">
             {['cucina', 'magazzino', 'accoglienza'].map((option) => (
               <label key={option} className="flex items-center gap-3 cursor-pointer group">

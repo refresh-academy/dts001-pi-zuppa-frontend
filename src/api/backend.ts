@@ -79,10 +79,24 @@ function extractUsers(usersLoad: any): any[] {
   return []
 }
 
-export async function createUser(utente: CreateUserProps): Promise<User> {
-  const res = await api.post("/users", utente)
-  const userLoad = res.data?.user ?? res.data?.data?.user ?? res.data
-  return normalizeUser(userLoad)
+export async function createUser(utente: CreateUserProps): Promise<User | { error: string }> {
+  const users = await getUsers();
+
+  const isDuplicate = users.some(
+    (u) => u.username.toLowerCase() === utente.username.toLowerCase()
+  );
+
+  if (isDuplicate) {
+    return { error: "Nome utente già esistente." };
+  }
+
+  try {
+    const res = await api.post("/users", utente);
+    const userLoad = res.data?.user ?? res.data?.data?.user ?? res.data;
+    return normalizeUser(userLoad);
+  } catch (err) {
+    return { error: "Errore durante la creazione dell'utente." };
+  }
 }
 
 export async function modifyUser(utente: CreateUserProps, id: string): Promise<User> {
