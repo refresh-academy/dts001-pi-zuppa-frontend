@@ -8,6 +8,7 @@ import {  NuovoUtente } from "./components/NuovoUtente"
 import { GestioneOspiti, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
+import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { Tendone } from "./components/TopBar"
 import { useAuth } from "./components/AuthContext"
 
@@ -150,6 +151,19 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <GestioneUtenti />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }/>
+          <Route
+            path="visualizza-utente/:id"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <VisualizzaUtente />
                   </div>
                 </>
               </ProtectedRoute>

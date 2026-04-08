@@ -1,5 +1,6 @@
 import { fetchUserToChange, getInitialUsers, searchUsersByName } from "../api/backend"
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 import { RicercaTabella } from "./RicercaTabella"
 import { User } from "../types/piuzuppa";
@@ -7,6 +8,7 @@ import { ModificaUtente } from "./ModificaUtente";
 
 
 export function GestioneUtenti() {
+  const navigate = useNavigate();
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
@@ -56,6 +58,10 @@ export function GestioneUtenti() {
     setRefreshKey((currentValue) => currentValue + 1);
   };
 
+  const handleRowClick = (id: string) => {
+    navigate(`/visualizza-utente/${id}`);
+  };
+
   if (editingUser) {
     return <ModificaUtente {...editingUser} onSave={handleSave} />;
   }
@@ -67,6 +73,7 @@ export function GestioneUtenti() {
       rows={filteredRows}
       onSearchChange={(val) => setSearchTerm(val)}
       onEdit={handleEdit}
+      onRowClick={handleRowClick}
     />
   )
 }

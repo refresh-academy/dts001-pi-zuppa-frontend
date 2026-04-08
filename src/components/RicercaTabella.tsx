@@ -1,17 +1,23 @@
-import { Search } from "lucide-react"
-import { useState } from "react"
-import { useNavigate } from "react-router"
+import { Search } from "lucide-react";
+import { useNavigate } from "react-router";
 
 type RicercaTabellaProps = {
-  title: string
-  columns: string[]
-  rows: { id: string; data: string[] }[]
-  onSearchChange: (value: string) => void
-  onEdit?: (id: string) => void
-}
+  title: string;
+  columns: string[];
+  rows: { id: string; data: string[] }[];
+  onSearchChange: (value: string) => void;
+  onEdit?: (id: string) => void;
+  onRowClick?: (id: string) => void;
+};
 
-export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }: RicercaTabellaProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function RicercaTabella({
+  title,
+  columns,
+  rows,
+  onSearchChange,
+  onEdit,
+  onRowClick,
+}: RicercaTabellaProps) {
   const navigate = useNavigate();
 
   return (
@@ -30,7 +36,9 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="flex w-full max-w-3xl flex-row items-center gap-4">
-          <label className="text-lg font-bold text-bianco">Cerca per nome</label>
+          <label className="text-lg font-bold text-bianco">
+            Cerca per nome
+          </label>
           <div className="relative flex-1">
             <input
               id="name"
@@ -43,23 +51,13 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
               <Search size={16} strokeWidth={2.4} />
             </div>
           </div>
-          <button 
+          <button
             type="button"
             onClick={() => navigate("/nuovo-utente")}
-            className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1">
+            className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1"
+          >
             Nuovo
           </button>
-          {onEdit && (
-            <button
-              type="button"
-              onClick={() => selectedId && onEdit(selectedId)}
-              disabled={!selectedId}
-              className={`rounded-xl border-2 px-6 py-2 font-bold shadow-[0_6px_0_0_#5c3417] transition duration-150 ${!selectedId ? 'border-amber-700 bg-amber-200 text-amber-900 opacity-80 shadow-[0_6px_0_0_#7c5a2b]' : 'border-amber-950 text-amber-950 hover:-translate-y-1 active:translate-y-1 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)]'
-                }`}
-            >
-              Modifica
-            </button>
-          )}
         </div>
       </form>
 
@@ -81,21 +79,16 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
             </thead>
             <tbody className="bg-sabbia text-bordeaux">
               {rows.map((row) => (
-                <tr key={row.id} className="border-t-2 border-amber-900/40">
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 accent-bordeaux"
-                      checked={selectedId === row.id}
-                      onChange={() =>
-                        setSelectedId((currentId) =>
-                          currentId === row.id ? null : row.id
-                        )
-                      }
-                    />
-                  </td>
+                <tr
+                  key={row.id}
+                  onClick={onRowClick ? () => onRowClick(row.id) : undefined}
+                  className={`border-t-2 border-amber-900/40 ${onRowClick ? "cursor-pointer hover:bg-amber-100/70 transition-colors" : ""}`}
+                >
+                  <td className="px-4 py-3"></td>
                   {row.data.map((cell, i) => (
-                    <td key={i} className="px-4 py-3">{cell}</td>
+                    <td key={i} className="px-4 py-3">
+                      {cell}
+                    </td>
                   ))}
                 </tr>
               ))}
@@ -104,5 +97,5 @@ export function RicercaTabella({ title, columns, rows, onSearchChange, onEdit }:
         </div>
       </div>
     </div>
-  )
+  );
 }
