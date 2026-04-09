@@ -8,6 +8,11 @@ type RicercaTabellaProps = {
   onSearchChange: (value: string) => void;
   onEdit?: (id: string) => void;
   onRowClick?: (id: string) => void;
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  showNewButton?: boolean;
+  newButtonLabel?: string;
+  newButtonPath?: string;
 };
 
 export function RicercaTabella({
@@ -17,6 +22,11 @@ export function RicercaTabella({
   onSearchChange,
   onEdit,
   onRowClick,
+  searchLabel = "Cerca per nome",
+  searchPlaceholder = "nome",
+  showNewButton = true,
+  newButtonLabel = "Nuovo",
+  newButtonPath = "/nuovo-utente",
 }: RicercaTabellaProps) {
   const navigate = useNavigate();
 
@@ -36,14 +46,12 @@ export function RicercaTabella({
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="flex w-full max-w-3xl flex-row items-center gap-4">
-          <label className="text-lg font-bold text-bianco">
-            Cerca per nome
-          </label>
+          <label className="text-lg font-bold text-bianco">{searchLabel}</label>
           <div className="relative flex-1">
             <input
               id="name"
               type="text"
-              placeholder="nome"
+              placeholder={searchPlaceholder}
               onChange={(e) => onSearchChange(e.target.value)}
               className="h-11 w-full rounded-xl border-2 border-bordeaux bg-sabbia pr-14 pl-4 text-bordeaux shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)] outline-none placeholder:text-bordeaux/70 focus:border-amber-800"
             />
@@ -51,13 +59,15 @@ export function RicercaTabella({
               <Search size={16} strokeWidth={2.4} />
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate("/nuovo-utente")}
-            className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1"
-          >
-            Nuovo
-          </button>
+          {showNewButton && (
+            <button
+              type="button"
+              onClick={() => navigate(newButtonPath)}
+              className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-5 py-2 font-bold text-amber-950 shadow-[0_6px_0_0_#5c3417,0_10px_18px_rgba(92,52,23,0.28)] transition duration-150 hover:-translate-y-1 active:translate-y-1"
+            >
+              {newButtonLabel}
+            </button>
+          )}
         </div>
       </form>
 

@@ -1,19 +1,42 @@
+import { useState } from "react";
+import { RicercaTabella } from "./RicercaTabella";
 
-import { RicercaTabella } from "./RicercaTabella"
+const columns = ["Nome prodotto", "Unita", "Peso", "Scadenza"];
+
+const staticRows = [
+  { id: "1", data: ["pippo", "2", "", "6/11/2027"] },
+  { id: "2", data: ["pluto", "5", "", "11/2026"] },
+  { id: "3", data: ["paperino", "", "10 kg", ""] },
+  { id: "4", data: ["minnie", "4", "", ""] },
+  { id: "5", data: ["gastone", "6", "", ""] },
+  { id: "6", data: ["paperoga", "", "8 kg", ""] },
+  { id: "7", data: ["archimede", "", "50 kg", ""] },
+  { id: "8", data: ["eta beta", "2", "", ""] },
+  { id: "9", data: ["zio paperone", "3", "", ""] },
+];
 
 export function GestioneMagazzino() {
-  const columns = [
-    "Nome prodotto",
-    "Unita",
-    "Peso",
-    "Scadenza"
-    
-  ]
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const rows = [
-    ["Pomodoro", "-", "30kg", "30/05/2026" ],
-    ["Biscotti", "50pezzi", "25kg", "27/03/2031"],
-  ]
+  const searchValue = searchTerm.trim().toLowerCase();
 
-  return <RicercaTabella title="Cerca prodotto" columns={columns} rows={rows} />
+  const filteredRows = staticRows.filter((row) =>
+    row.data[0].toLowerCase().includes(searchValue)
+  );
+
+  const sortedRows = [...filteredRows].sort((a, b) =>
+    a.data[0].localeCompare(b.data[0], "it", { sensitivity: "base" })
+  );
+
+  return (
+    <RicercaTabella
+      title="Giacenze Magazzino"
+      columns={columns}
+      rows={sortedRows}
+      onSearchChange={setSearchTerm}
+      searchLabel="Cerca prodotto"
+      searchPlaceholder="prodotto"
+      showNewButton={false}
+    />
+  );
 }

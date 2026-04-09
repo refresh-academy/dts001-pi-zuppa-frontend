@@ -113,6 +113,20 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="anagrafica-ospiti"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneOspiti />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }
+          />
           
           <Route
             path="nuovo-ospite"
@@ -181,7 +195,21 @@ function App() {
                 </>
               </ProtectedRoute>
             }/>
+          <Route
+            path="giacenze"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneMagazzino />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }/>
           <Route path="*" element={<Navigate to="/" replace />} />
+        
         </Routes>
       </main>
     </>
