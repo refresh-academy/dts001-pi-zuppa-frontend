@@ -50,11 +50,8 @@ function cleanPgArray(value: any): string[] {
 }
 
 function normalizeUser(raw: any): User {
-  const puntiDistribuzione = cleanPgArray(
-    raw?.punto_distribuzione ?? raw?.puntiDistribuzione ?? raw?.site
-  ) as PuntoDiDistribuzione[];
-
-  const ruoli = cleanPgArray(raw?.ruolo ?? raw?.ruoli ?? raw?.role) as Ruolo[];
+  const puntiDistribuzione = (Array.isArray(raw?.sites) ? raw.sites : []) as PuntoDiDistribuzione[];
+  const ruoli = (Array.isArray(raw?.roles) ? raw.roles : []) as Ruolo[];
 
   return {
     id: String(raw?.id ?? ""),
@@ -68,7 +65,6 @@ function normalizeUser(raw: any): User {
     puntiDistribuzione,
     ruoli,
   };
-
 }
 
 function extractUsers(usersLoad: any): any[] {
