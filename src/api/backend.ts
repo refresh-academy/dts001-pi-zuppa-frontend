@@ -33,6 +33,7 @@ type CreateUserProps = {
   password: string
   email: string
   accessLevel: User["livelloAccesso"]
+  abilitazione: boolean
   site: PuntoDiDistribuzione[]
   role: Ruolo[]
 }
@@ -62,6 +63,7 @@ function normalizeUser(raw: any): User {
     telefono: String(raw?.telefono ?? ""),
     email: String(raw?.email ?? ""),
     livelloAccesso: (raw?.livello_accesso ?? raw?.livelloAccesso ?? "volontario") as User["livelloAccesso"],
+    abilitazione: Boolean(raw?.abilitazione ?? true),
     puntiDistribuzione,
     ruoli,
   };

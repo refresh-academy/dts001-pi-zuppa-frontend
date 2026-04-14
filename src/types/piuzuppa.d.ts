@@ -7,7 +7,8 @@ export type User = {
     telefono: string,
     email: string,
     livelloAccesso: "volontario" | "coordinatore",
-    puntiDistribuzione: PuntoDiDistribuzione[]
+    abilitazione: boolean,
+    puntiDistribuzione: PuntoDiDistribuzione[],
     ruoli: Ruolo[]
 }
 
