@@ -114,6 +114,54 @@ export function VisualizzaUtente() {
     })
   }
 
+  const handleAccessLevelChange = (livelloAccesso: User["livelloAccesso"]) => {
+    setFormData((current) => {
+      if (!current) return current
+
+      return {
+        ...current,
+        livelloAccesso,
+        ruoli: livelloAccesso === "coordinatore" ? [...ruoliOptions] : current.ruoli,
+      }
+    })
+  }
+
+  const persistUserChanges = async (
+    nextFormData: EditableUserForm,
+    nextIsUserEnabled: boolean,
+    nextPassword?: string,
+  ) => {
+    if (!id || !user) throw new Error("Missing user context")
+
+    await modifyUser(
+      {
+        name: nextFormData.nome,
+        surname: nextFormData.cognome,
+        phone: nextFormData.telefono,
+        username: nextFormData.username,
+        password: nextPassword ?? user.password,
+        email: nextFormData.email,
+        accessLevel: nextFormData.livelloAccesso,
+        abilitation: nextIsUserEnabled,
+        site: nextFormData.puntiDistribuzione,
+        role: nextFormData.ruoli,
+      },
+      id,
+    )
+
+    const refreshedUser = await fetchUserToChange(id)
+    if (!refreshedUser) {
+      throw new Error("User refresh failed")
+    }
+
+    setUser(refreshedUser)
+    setFormData(toEditableUserForm(refreshedUser))
+    setIsUserEnabled(refreshedUser.abilitazione)
+    syncUser(refreshedUser)
+
+    return refreshedUser
+  }
+
   const handleDeleteUser = () => {
     if (!id || !formData || isDeleting || isSaving) return
     setDeleteFeedback("")
@@ -153,32 +201,11 @@ export function VisualizzaUtente() {
     setDeleteFeedback("")
 
     try {
-      await modifyUser(
-        {
-          name: formData.nome,
-          surname: formData.cognome,
-          phone: formData.telefono,
-          username: formData.username,
-          password: user.password,
-          email: formData.email,
-          accessLevel: formData.livelloAccesso,
-          abilitazione: isUserEnabled,
-          site: formData.puntiDistribuzione,
-          role: formData.ruoli,
-        },
-        id,
-      )
-
-      const refreshedUser = await fetchUserToChange(id)
-      if (refreshedUser) {
-        setUser(refreshedUser)
-        setFormData(toEditableUserForm(refreshedUser))
-        setIsUserEnabled(refreshedUser.abilitazione)
-        syncUser(refreshedUser)
-      }
+      await persistUserChanges(formData, isUserEnabled)
 
       setIsEditing(false)
-      setSaveFeedback("Utente salvato con successo.")
+      setSaveFeedback("Utente salvato con successo. Reindirizzamento in corso...")
+      window.setTimeout(() => navigate("/utenti"), 2000)
     } catch {
       setSaveFeedback("Errore durante il salvataggio dell'utente.")
     } finally {
@@ -197,10 +224,52 @@ export function VisualizzaUtente() {
       return
     }
 
-    setPasswordFeedback("Password aggiornata (simulazione statica).")
-    setNewPassword("")
-    setConfirmPassword("")
-    setIsPasswordEditorOpen(false)
+    void (async () => {
+      if (!formData || !user || isSaving || isDeleting || isDeleted) return
+
+      setIsSaving(true)
+      setPasswordFeedback("")
+      setSaveFeedback("")
+      setDeleteFeedback("")
+
+      try {
+        await persistUserChanges(formData, isUserEnabled, newPassword)
+        setPasswordFeedback("Password aggiornata con successo.")
+        setNewPassword("")
+        setConfirmPassword("")
+        setIsPasswordEditorOpen(false)
+      } catch {
+        setPasswordFeedback("Errore durante il salvataggio della password.")
+      } finally {
+        setIsSaving(false)
+      }
+    })()
+  }
+
+  const handleToggleUserEnabled = () => {
+    void (async () => {
+      if (!formData || !user || isSaving || isDeleting || isDeleted) return
+
+      const nextIsUserEnabled = !isUserEnabled
+
+      setIsSaving(true)
+      setSaveFeedback("")
+      setDeleteFeedback("")
+      setPasswordFeedback("")
+
+      try {
+        await persistUserChanges(formData, nextIsUserEnabled)
+        setSaveFeedback(
+          nextIsUserEnabled
+            ? "Utente abilitato con successo."
+            : "Utente disabilitato con successo.",
+        )
+      } catch {
+        setSaveFeedback("Errore durante l'aggiornamento dello stato utente.")
+      } finally {
+        setIsSaving(false)
+      }
+    })()
   }
 
   return (
@@ -232,7 +301,7 @@ export function VisualizzaUtente() {
         </span>
         <button
           type="button"
-          onClick={() => setIsUserEnabled((currentValue) => !currentValue)}
+          onClick={handleToggleUserEnabled}
           disabled={isDeleted || !formData || isDeleting || isSaving}
           aria-label={isUserEnabled ? "Disabilita" : "Abilita"}
           title={isUserEnabled ? "Disabilita utente" : "Abilita utente"}
@@ -403,11 +472,7 @@ export function VisualizzaUtente() {
                     type="radio"
                     name="accessLevelView"
                     checked={formData.livelloAccesso === option}
-                    onChange={() =>
-                      setFormData((current) =>
-                        current ? { ...current, livelloAccesso: option } : current
-                      )
-                    }
+                    onChange={() => handleAccessLevelChange(option)}
                     disabled={isFormDisabled}
                     className="appearance-none w-6 h-6 rounded-full border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900"
                   />
@@ -444,7 +509,7 @@ export function VisualizzaUtente() {
                     type="checkbox"
                     checked={formData.ruoli.includes(option)}
                     onChange={() => toggleRuolo(option)}
-                    disabled={isFormDisabled}
+                    disabled={isFormDisabled || formData.livelloAccesso === "coordinatore"}
                     className="h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia accent-amber-900"
                   />
                   <span className="text-bianco capitalize">{option}</span>
