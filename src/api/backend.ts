@@ -103,6 +103,27 @@ export async function modifyUser(utente: CreateUserProps, id: string): Promise<U
   return normalizeUser(userLoad)
 }
 
+export type DeleteUserResult =
+  | { status: "success" }
+  | { status: "not-found" }
+  | { status: "error"; message: string }
+
+export async function deleteUser(id: string): Promise<DeleteUserResult> {
+  try {
+    await api.delete(`/users/${id}`)
+    return { status: "success" }
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return { status: "not-found" }
+    }
+
+    return {
+      status: "error",
+      message: "Errore durante l'eliminazione dell'utente.",
+    }
+  }
+}
+
 export async function getUsers(): Promise<User[]> {
   const res = await api.get("/users")
   return extractUsers(res.data).map(normalizeUser)

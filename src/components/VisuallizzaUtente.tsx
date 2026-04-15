@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { ShieldCheck, ShieldX, SquarePen, Trash2, Undo2 } from "lucide-react"
-import { fetchUserToChange } from "../api/backend"
+import { deleteUser, fetchUserToChange } from "../api/backend"
 import type { PuntoDiDistribuzione, Ruolo, User } from "../types/piuzuppa"
 
 const puntiDistribuzioneOptions: PuntoDiDistribuzione[] = [
@@ -46,10 +46,12 @@ export function VisualizzaUtente() {
   const [isEditing, setIsEditing] = useState(false)
   const [isUserEnabled, setIsUserEnabled] = useState(true)
   const [isDeleted, setIsDeleted] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [isPasswordEditorOpen, setIsPasswordEditorOpen] = useState(false)
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordFeedback, setPasswordFeedback] = useState("")
+  const [deleteFeedback, setDeleteFeedback] = useState("")
 
   useEffect(() => {
     const loadUser = async () => {
@@ -70,13 +72,14 @@ export function VisualizzaUtente() {
       setNewPassword("")
       setConfirmPassword("")
       setPasswordFeedback("")
+      setDeleteFeedback("")
       setIsLoading(false)
     }
 
     loadUser()
   }, [id])
 
-  const isFormDisabled = !isEditing || isDeleted
+  const isFormDisabled = !isEditing || isDeleted || isDeleting
 
   const toggleSite = (site: PuntoDiDistribuzione) => {
     setFormData((current) => {
@@ -104,14 +107,34 @@ export function VisualizzaUtente() {
     })
   }
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
+    if (!id || !formData || isDeleting) return
+
     const confirmed = window.confirm(
-      "Questa azione e' solo statica per ora. Vuoi simulare l'eliminazione dell'utente?",
+      "Sei sicura/o di voler eliminare questo utente? L'operazione e' definitiva.",
     )
-    if (confirmed) {
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    setDeleteFeedback("")
+
+    const result = await deleteUser(id)
+
+    if (result.status === "success") {
       setIsDeleted(true)
       setIsEditing(false)
+      setIsPasswordEditorOpen(false)
+      setDeleteFeedback("Utente eliminato con successo.")
+      setIsDeleting(false)
+      navigate("/utenti")
+      return
+    } else if (result.status === "not-found") {
+      setDeleteFeedback("Utente non trovato o gia' eliminato.")
+    } else {
+      setDeleteFeedback(result.message)
     }
+
+    setIsDeleting(false)
   }
 
   const handleSavePassword = () => {
@@ -161,7 +184,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsUserEnabled((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData}
+          disabled={isDeleted || !formData || isDeleting}
           aria-label={isUserEnabled ? "Disabilita" : "Abilita"}
           title={isUserEnabled ? "Disabilita utente" : "Abilita utente"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-2 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -175,7 +198,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsEditing((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData}
+          disabled={isDeleted || !formData || isDeleting}
           aria-label={isEditing ? "Blocca Modifica" : "Modifica"}
           title={isEditing ? "Blocca Modifica" : "Modifica"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-2 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -185,7 +208,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsPasswordEditorOpen((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData}
+          disabled={isDeleted || !formData || isDeleting}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-4 py-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isPasswordEditorOpen ? "Chiudi Password" : "Cambia Password"}
@@ -193,12 +216,12 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={handleDeleteUser}
-          disabled={isDeleted || !formData}
-          aria-label="Elimina Utente"
-          title="Elimina Utente"
+          disabled={isDeleted || !formData || isDeleting}
+          aria-label={isDeleting ? "Eliminazione in corso" : "Elimina Utente"}
+          title={isDeleting ? "Eliminazione in corso" : "Elimina Utente"}
           className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-4 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Trash2 size={18} strokeWidth={2.4} />
+          {isDeleting ? "..." : <Trash2 size={18} strokeWidth={2.4} />}
         </button>
       </div>
 
@@ -208,9 +231,9 @@ export function VisualizzaUtente() {
         <p className="px-8 pt-8 text-bianco">Utente non trovato.</p>
       ) : isDeleted ? (
         <div className="mx-8 mt-8 rounded-lg border-2 border-red-800 bg-red-950/60 p-4">
-          <p className="font-bold text-red-200">Utente eliminato (simulazione statica).</p>
+          <p className="font-bold text-red-200">{deleteFeedback || "Utente eliminato."}</p>
           <p className="mt-1 text-sm text-red-100">
-            Nessuna modifica e' stata inviata al database.
+            L'eliminazione e' stata inviata al database.
           </p>
         </div>
       ) : !formData ? (
@@ -383,7 +406,9 @@ export function VisualizzaUtente() {
             </div>
           </div>
           <p className="col-span-2 text-xs text-bianco/70">
-            {passwordFeedback || "Modalita' statica: modifica, abilita/disabilita, password ed eliminazione non vengono salvate su DB."}
+            {passwordFeedback ||
+              deleteFeedback ||
+              "Modalita' statica: modifica, abilita/disabilita e password non vengono salvate su DB. L'eliminazione utente invece e' attiva."}
           </p>
         </div>
       )}
