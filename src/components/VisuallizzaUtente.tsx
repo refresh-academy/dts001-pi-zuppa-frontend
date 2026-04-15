@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { ShieldCheck, ShieldX, SquarePen, Trash2, Undo2 } from "lucide-react"
-import { deleteUser, fetchUserToChange } from "../api/backend"
+import { deleteUser, fetchUserToChange, modifyUser } from "../api/backend"
+import { useAuth } from "./AuthContext"
 import type { PuntoDiDistribuzione, Ruolo, User } from "../types/piuzuppa"
 
 const puntiDistribuzioneOptions: PuntoDiDistribuzione[] = [
@@ -38,6 +39,7 @@ function toEditableUserForm(user: User): EditableUserForm {
 }
 
 export function VisualizzaUtente() {
+  const { syncUser } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams()
   const [user, setUser] = useState<User | null>(null)
@@ -47,11 +49,14 @@ export function VisualizzaUtente() {
   const [isUserEnabled, setIsUserEnabled] = useState(true)
   const [isDeleted, setIsDeleted] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [isPasswordEditorOpen, setIsPasswordEditorOpen] = useState(false)
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordFeedback, setPasswordFeedback] = useState("")
   const [deleteFeedback, setDeleteFeedback] = useState("")
+  const [saveFeedback, setSaveFeedback] = useState("")
 
   useEffect(() => {
     const loadUser = async () => {
@@ -66,20 +71,22 @@ export function VisualizzaUtente() {
         setFormData(toEditableUserForm(loadedUser))
       }
       setIsEditing(false)
-      setIsUserEnabled(true)
+      setIsUserEnabled(loadedUser?.abilitazione ?? true)
       setIsDeleted(false)
       setIsPasswordEditorOpen(false)
       setNewPassword("")
       setConfirmPassword("")
       setPasswordFeedback("")
       setDeleteFeedback("")
+      setSaveFeedback("")
+      setIsDeleteDialogOpen(false)
       setIsLoading(false)
     }
 
     loadUser()
   }, [id])
 
-  const isFormDisabled = !isEditing || isDeleted || isDeleting
+  const isFormDisabled = !isEditing || isDeleted || isDeleting || isSaving
 
   const toggleSite = (site: PuntoDiDistribuzione) => {
     setFormData((current) => {
@@ -107,16 +114,15 @@ export function VisualizzaUtente() {
     })
   }
 
-  const handleDeleteUser = async () => {
-    if (!id || !formData || isDeleting) return
-
-    const confirmed = window.confirm(
-      "Sei sicura/o di voler eliminare questo utente? L'operazione e' definitiva.",
-    )
-    if (!confirmed) return
-
-    setIsDeleting(true)
+  const handleDeleteUser = () => {
+    if (!id || !formData || isDeleting || isSaving) return
     setDeleteFeedback("")
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDeleteUser = async () => {
+    if (!id || !formData || isDeleting) return
+    setIsDeleting(true)
 
     const result = await deleteUser(id)
 
@@ -124,9 +130,10 @@ export function VisualizzaUtente() {
       setIsDeleted(true)
       setIsEditing(false)
       setIsPasswordEditorOpen(false)
+      setIsDeleteDialogOpen(false)
       setDeleteFeedback("Utente eliminato con successo.")
       setIsDeleting(false)
-      navigate("/utenti")
+      window.setTimeout(() => navigate("/utenti"), 2500)
       return
     } else if (result.status === "not-found") {
       setDeleteFeedback("Utente non trovato o gia' eliminato.")
@@ -134,7 +141,49 @@ export function VisualizzaUtente() {
       setDeleteFeedback(result.message)
     }
 
+    setIsDeleteDialogOpen(false)
     setIsDeleting(false)
+  }
+
+  const handleSaveUser = async () => {
+    if (!id || !user || !formData || isSaving || isDeleting || isDeleted) return
+
+    setIsSaving(true)
+    setSaveFeedback("")
+    setDeleteFeedback("")
+
+    try {
+      await modifyUser(
+        {
+          name: formData.nome,
+          surname: formData.cognome,
+          phone: formData.telefono,
+          username: formData.username,
+          password: user.password,
+          email: formData.email,
+          accessLevel: formData.livelloAccesso,
+          abilitazione: isUserEnabled,
+          site: formData.puntiDistribuzione,
+          role: formData.ruoli,
+        },
+        id,
+      )
+
+      const refreshedUser = await fetchUserToChange(id)
+      if (refreshedUser) {
+        setUser(refreshedUser)
+        setFormData(toEditableUserForm(refreshedUser))
+        setIsUserEnabled(refreshedUser.abilitazione)
+        syncUser(refreshedUser)
+      }
+
+      setIsEditing(false)
+      setSaveFeedback("Utente salvato con successo.")
+    } catch {
+      setSaveFeedback("Errore durante il salvataggio dell'utente.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleSavePassword = () => {
@@ -184,7 +233,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsUserEnabled((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData || isDeleting}
+          disabled={isDeleted || !formData || isDeleting || isSaving}
           aria-label={isUserEnabled ? "Disabilita" : "Abilita"}
           title={isUserEnabled ? "Disabilita utente" : "Abilita utente"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-2 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -198,7 +247,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsEditing((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData || isDeleting}
+          disabled={isDeleted || !formData || isDeleting || isSaving}
           aria-label={isEditing ? "Blocca Modifica" : "Modifica"}
           title={isEditing ? "Blocca Modifica" : "Modifica"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-2 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -208,7 +257,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={() => setIsPasswordEditorOpen((currentValue) => !currentValue)}
-          disabled={isDeleted || !formData || isDeleting}
+          disabled={isDeleted || !formData || isDeleting || isSaving}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-4 py-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isPasswordEditorOpen ? "Chiudi Password" : "Cambia Password"}
@@ -216,7 +265,7 @@ export function VisualizzaUtente() {
         <button
           type="button"
           onClick={handleDeleteUser}
-          disabled={isDeleted || !formData || isDeleting}
+          disabled={isDeleted || !formData || isDeleting || isSaving}
           aria-label={isDeleting ? "Eliminazione in corso" : "Elimina Utente"}
           title={isDeleting ? "Eliminazione in corso" : "Elimina Utente"}
           className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-4 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -232,9 +281,7 @@ export function VisualizzaUtente() {
       ) : isDeleted ? (
         <div className="mx-8 mt-8 rounded-lg border-2 border-red-800 bg-red-950/60 p-4">
           <p className="font-bold text-red-200">{deleteFeedback || "Utente eliminato."}</p>
-          <p className="mt-1 text-sm text-red-100">
-            L'eliminazione e' stata inviata al database.
-          </p>
+         
         </div>
       ) : !formData ? (
         <p className="px-8 pt-8 text-bianco">Dati utente non disponibili.</p>
@@ -405,13 +452,56 @@ export function VisualizzaUtente() {
               ))}
             </div>
           </div>
-          <p className="col-span-2 text-xs text-bianco/70">
-            {passwordFeedback ||
-              deleteFeedback ||
-              "Modalita' statica: modifica, abilita/disabilita e password non vengono salvate su DB. L'eliminazione utente invece e' attiva."}
-          </p>
+          <div className="col-span-2 flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={handleSaveUser}
+              disabled={isDeleted || !formData || !isEditing || isDeleting || isSaving}
+              className="ml-90 rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-4 py-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isSaving ? "Salvataggio..." : "Salva"}
+            </button>
+          </div>
+          {passwordFeedback || deleteFeedback || saveFeedback ? (
+            <p className="col-span-2 text-xs text-bianco/70">
+              {passwordFeedback || deleteFeedback || saveFeedback}
+            </p>
+          ) : null}
         </div>
       )}
+
+      {isDeleteDialogOpen ? (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="mx-4 w-full max-w-xl rounded-xl border-2 border-red-900 bg-amber-950 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-giallo">Conferma eliminazione</h2>
+            <p className="mt-3 text-bianco">
+              Sei sicura/o di voler cancellare questo utente?
+            </p>
+            <p className="mt-1 text-sm text-bianco/80">
+              Questa azione e' definitiva e non puo' essere annullata.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={isDeleting}
+                className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-4 py-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60"
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteUser}
+                disabled={isDeleting}
+                className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-4 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60"
+              >
+                {isDeleting ? "Eliminazione..." : "Conferma"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

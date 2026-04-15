@@ -104,7 +104,7 @@ function App() {
                           Ciao{user?.nome ? `, ${user.nome}` : ""}!
                         </h1>
                         <p className="mt-3 text-bordeaux/90">
-                          Bentornata/o nella dashboard Più Zuppa.
+                         Siamo felici di averti qui!
                         </p>
                         <div className="mt-6 rounded-xl bg-white/55 p-4 shadow-md">
                           <p className="font-bold text-bordeaux">Come orientarti rapidamente:</p>
