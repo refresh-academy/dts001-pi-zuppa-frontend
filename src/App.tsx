@@ -76,6 +76,8 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const { user } = useAuth()
+
   return (
     <>
       <main className="w-full">
@@ -94,7 +96,28 @@ function App() {
               <ProtectedRoute>
                 <>
                   <Tendone />
-                  <Sidebar sidebarItems={sidebarItems} />
+                  <div className="mr-4 flex">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <section className="ml-4 mt-6 flex min-h-[60vh] w-full items-center justify-center px-8 py-8">
+                      <div className="w-full max-w-2xl text-center">
+                        <h1 className="font-chalk text-5xl text-bordeaux drop-shadow-[0_2px_3px_rgba(255,255,255,0.45)]">
+                          Ciao{user?.nome ? `, ${user.nome}` : ""}!
+                        </h1>
+                        <p className="mt-3 text-bordeaux/90">
+                          Bentornata/o nella dashboard Più Zuppa.
+                        </p>
+                        <div className="mt-6 rounded-xl bg-white/55 p-4 shadow-md">
+                          <p className="font-bold text-bordeaux">Come orientarti rapidamente:</p>
+                          <p className="mt-2 text-bordeaux/95">
+                            Nel menu a sinistra trovi le sezioni di navigazione.
+                          </p>
+                          <p className="text-bordeaux/95">
+                            In alto a destra puoi cambiare il punto di distribuzione.
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
                 </>
               </ProtectedRoute>
             }
