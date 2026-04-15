@@ -33,7 +33,7 @@ type CreateUserProps = {
   password: string
   email: string
   accessLevel: User["livelloAccesso"]
-  abilitazione: boolean
+  abilitation: boolean
   site: PuntoDiDistribuzione[]
   role: Ruolo[]
 }

@@ -8,6 +8,8 @@ import type {
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
 
+const roleOptions: Ruolo[] = ["cucina", "magazzino", "accoglienza"]
+
 export function NuovoUtente() {
     const [name, setName] = useState("")
     const [surname, setSurname] = useState("")
@@ -20,16 +22,23 @@ export function NuovoUtente() {
     const [password, setPassword] = useState("")
     const [passwordConfirm, setPasswordConfirm] = useState("")
     const [showPassword, setShowPassword] = useState(false)
-    const navigate = useNavigate() 
+    const [errorMessage, setErrorMessage] = useState("")
+    const [successMessage, setSuccessMessage] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const navigate = useNavigate()
+    const abilitation = true; 
     const passwordsDoNotMatch =
       passwordConfirm.length > 0 && password !== passwordConfirm
+    const isCoordinatore = accessLevel === "coordinatore"
     const isFormValid =
       Boolean(name.trim()) &&
-      Boolean(surname.trim()) &&
+      Boolean(email.trim()) &&
       Boolean(username.trim()) &&
       Boolean(password) &&
       password === passwordConfirm &&
-      Boolean(accessLevel)
+      Boolean(accessLevel) &&
+      site.length > 0 &&
+      !isSubmitting
     
     const toggleSelection = <T,>(list: T[], value: T, setter: (val: T[]) => void) => {
   if (list.includes(value)) {
@@ -39,18 +48,32 @@ export function NuovoUtente() {
   }
 };
 
+    function handleAccessLevelChange(nextAccessLevel: User["livelloAccesso"]) {
+      setAccessLevel(nextAccessLevel)
+
+      if (nextAccessLevel === "coordinatore") {
+        setRole(roleOptions)
+      }
+    }
+
     async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
         if (
           name.trim() &&
+          email.trim() &&
           username.trim() &&
           password &&
           password === passwordConfirm &&
           accessLevel !== "" &&
+          site.length > 0 &&
           (accessLevel === "coordinatore" || role.length > 0)
         ) {
-            await createUser({
+            setIsSubmitting(true)
+            setErrorMessage("")
+            setSuccessMessage("")
+
+            const result = await createUser({
               name,
               surname,
               phone,
@@ -58,11 +81,24 @@ export function NuovoUtente() {
               password,
               email,
               accessLevel,
+              abilitation,
               site,
               role
             })
-            navigate("/utenti"); 
-        } else {alert("Compila i campi obbligatori, seleziona il livello di accesso e controlla che le password coincidano.")}
+
+            if ("error" in result) {
+              setErrorMessage(result.error)
+              setIsSubmitting(false)
+              return
+            }
+
+            setSuccessMessage("Utente creato con successo. Reindirizzamento in corso...")
+            window.setTimeout(() => navigate("/utenti"), 2000)
+            return
+        } else {
+          setSuccessMessage("")
+          setErrorMessage("Compila i campi obbligatori, seleziona il livello di accesso e controlla che le password coincidano.")
+        }
     }
 
   return (
@@ -75,6 +111,10 @@ export function NuovoUtente() {
       <div className="flex flex-row gap-4 pl-8">
         <h1 className="text-giallo  text-2xl font-bold">Nuovo Utente</h1>
         <h2 className="text-bianco text-sm mt-2"> I campi contrassegnati con * sono obbligatori</h2>
+      </div>
+      <div className="pl-8 pt-4">
+        {errorMessage ? <p className="text-red-400">{errorMessage}</p> : null}
+        {successMessage ? <p className="text-green-400">{successMessage}</p> : null}
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-12 gap-y-6 p-8 items-end">
@@ -116,7 +156,7 @@ export function NuovoUtente() {
             className="border-2 bg-sabbia border-bordeaux rounded-md pl-2 h-10 outline-none" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-bianco text-sm">Email:</label>
+          <label className="text-bianco text-sm">Email *</label>
           <input 
             onChange={(event) => setEmail(event.target.value)}
             value={email}
@@ -177,7 +217,9 @@ export function NuovoUtente() {
                   <input 
                     id="accessLevel"
                     onChange={(event) =>
-                      setAccessLevel(event.target.value as User["livelloAccesso"])
+                      handleAccessLevelChange(
+                        event.target.value as User["livelloAccesso"],
+                      )
                     }
                     type="radio" 
                     name="accessLevel"
@@ -222,19 +264,23 @@ export function NuovoUtente() {
         </div>
 
        <div className="flex flex-col gap-3">
-          <label className="text-bianco text-sm font-semibold">Ruolo {accessLevel !== "coordinatore" ? "*" : ""}</label>
+          <label className="text-bianco text-sm font-semibold">Ruolo {!isCoordinatore ? "*" : ""}</label>
           <div className="flex gap-6">
-            {['cucina', 'magazzino', 'accoglienza'].map((option) => (
-              <label key={option} className="flex items-center gap-3 cursor-pointer group">
+            {roleOptions.map((option) => (
+              <label
+                key={option}
+                className={`flex items-center gap-3 group ${isCoordinatore ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+              >
                 <div className="relative flex items-center justify-center">
                   <input 
                     checked={role.includes(option as Ruolo)}
+                    disabled={isCoordinatore}
                     onChange={() => toggleSelection(role, option as Ruolo, setRole)}
                     id="role"
                     type="checkbox" 
                     name="role"
                     value={option}
-                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
+                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all disabled:cursor-not-allowed disabled:opacity-70"
                   />
                   <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
                     ✓
@@ -253,7 +299,7 @@ export function NuovoUtente() {
           disabled={!isFormValid}
           className="h-10 rounded-md font-bold text-white shadow-lg transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-amber-950 disabled:text-white/50 disabled:shadow-none enabled:bg-amber-900 enabled:hover:bg-amber-800"
         >
-          REGISTRA
+          {isSubmitting ? "SALVATAGGIO..." : "REGISTRA"}
         </button>
       </form>
     </div>
