@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { CalendarDays } from "lucide-react";
-import { getEntityNames, getMealTypes } from "../api/backend";
+import { createGuest, getEntityNames, getMealTypes } from "../api/backend";
 
 type MealType = string;
 type DeliveryType = "" | "mensa" | "asporto";
@@ -11,7 +11,12 @@ type MealRow = {
   consegna: DeliveryType;
 };
 
-export function EntitySelect() {
+type EntitySelectProps = {
+  id?: string
+  name?: string
+}
+
+export function EntitySelect({ id = "agency", name = "agency" }: EntitySelectProps) {
   const [entities, setEntities] = useState<string[]>([]);
 
   useEffect(() => {
@@ -21,7 +26,8 @@ export function EntitySelect() {
   return (
   
     <select
-            id="agency"
+            id={id}
+            name={name}
             defaultValue=""
             required
             className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none"
@@ -37,12 +43,15 @@ export function EntitySelect() {
 }
 
 export function NuovoOspite() {
+  const formRef = useRef<HTMLFormElement | null>(null);
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [familyCount, setFamilyCount] = useState<number | "">("");
   const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
   const [isMealWarningOpen, setIsMealWarningOpen] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
+  const [errorNotice, setErrorNotice] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const normalizedFamilyCount = familyCount === "" ? 0 : familyCount;
   const hasMealCountError =
     normalizedFamilyCount > 0 && mealRows.length < normalizedFamilyCount;
@@ -113,21 +122,92 @@ export function NuovoOspite() {
     setSubmitNotice("Registrazione confermata.");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const submitGuest = async (formElement: HTMLFormElement) => {
+    if (mealRows.length === 0) {
+      setErrorNotice("Inserisci almeno un pasto.")
+      return
+    }
+
+    if (mealRows.some((row) => row.tipo.trim() === "" || row.consegna === "")) {
+      setErrorNotice("Completa tipo e consegna per tutti i pasti.")
+      return
+    }
+
+    const formData = new FormData(formElement)
+    const familyCountValue = formData.get("familyCount")
+    const nameValue = formData.get("name")
+    const surnameValue = formData.get("surname")
+    const birthDateValue = formData.get("birthDate")
+    const residentValue = formData.get("resident")
+    const professionValue = formData.get("profession")
+    const phoneValue = formData.get("phone")
+    const entityNameValue = formData.get("agency")
+
+    if (
+      typeof familyCountValue !== "string" ||
+      typeof nameValue !== "string" ||
+      typeof surnameValue !== "string" ||
+      typeof birthDateValue !== "string" ||
+      typeof residentValue !== "string" ||
+      typeof professionValue !== "string" ||
+      typeof phoneValue !== "string" ||
+      typeof entityNameValue !== "string"
+    ) {
+      setErrorNotice("Compila tutti i campi obbligatori.")
+      return
+    }
+
+    setIsSubmitting(true)
+    setErrorNotice("")
+    setSubmitNotice("")
+
+    const result = await createGuest({
+      name: nameValue.trim(),
+      surname: surnameValue.trim(),
+      resident: residentValue === "si",
+      birthDate: birthDateValue,
+      familyCount: Number(familyCountValue),
+      profession: professionValue.trim(),
+      phone: phoneValue.trim(),
+      entityName: entityNameValue,
+      meals: mealRows.map((row) => ({
+        mealType: row.tipo,
+        deliveryType: row.consegna as Exclude<DeliveryType, "">,
+      })),
+    })
+
+    if ("error" in result) {
+      setErrorNotice(result.error)
+      setIsSubmitting(false)
+      return
+    }
+
+    finalizeSubmit()
+    formElement.reset()
+    setFamilyCount("")
+    setMealRows([])
+    setIsSubmitting(false)
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitNotice("");
+    setErrorNotice("")
 
     if (hasMealCountError) {
       setIsMealWarningOpen(true);
       return;
     }
 
-    finalizeSubmit();
+    await submitGuest(event.currentTarget);
   };
 
-  const handleConfirmContinue = () => {
+  const handleConfirmContinue = async () => {
     setIsMealWarningOpen(false);
-    finalizeSubmit();
+    const formElement = formRef.current
+    if (formElement instanceof HTMLFormElement) {
+      await submitGuest(formElement)
+    }
   };
 
   const handleOpenDatePicker = () => {
@@ -160,11 +240,12 @@ export function NuovoOspite() {
         Tutti i campi sono obbligatori.
       </p>
       
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-6 lg:grid-cols-2 lg:gap-x-8">
+      <form ref={formRef} onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-6 lg:grid-cols-2 lg:gap-x-8">
         <div className="flex items-center gap-3">
           <label htmlFor="name" className="min-w-28 text-sm font-semibold text-bianco">Nome</label>
           <input
             id="name"
+            name="name"
             type="text"
             required
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
@@ -175,6 +256,7 @@ export function NuovoOspite() {
           <label htmlFor="surname" className="min-w-28 text-sm font-semibold text-bianco">Cognome</label>
           <input
             id="surname"
+            name="surname"
             type="text"
             required
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
@@ -187,6 +269,7 @@ export function NuovoOspite() {
             <input
               ref={dateInputRef}
               id="dob"
+              name="birthDate"
               type="date"
               required
               className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none [&::-webkit-calendar-picker-indicator]:opacity-0"
@@ -208,11 +291,11 @@ export function NuovoOspite() {
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-bianco">
               <span className="text-sm font-semibold">Si</span>
-              <input type="radio" name="residenza" value="si" required className="h-5 w-5 accent-bordeaux" />
+              <input type="radio" name="resident" value="si" required className="h-5 w-5 accent-bordeaux" />
             </label>
             <label className="flex items-center gap-2 text-bianco">
               <span className="text-sm font-semibold">No</span>
-              <input type="radio" name="residenza" value="no" required className="h-5 w-5 accent-bordeaux" />
+              <input type="radio" name="resident" value="no" required className="h-5 w-5 accent-bordeaux" />
             </label>
           </div>
         </div>
@@ -221,6 +304,7 @@ export function NuovoOspite() {
           <label htmlFor="profession" className="min-w-28 text-sm font-semibold text-bianco">Professione</label>
           <input
             id="profession"
+            name="profession"
             type="text"
             required
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
@@ -231,6 +315,7 @@ export function NuovoOspite() {
           <label htmlFor="phone" className="min-w-28 text-sm font-semibold text-bianco">Telefono</label>
           <input
             id="phone"
+            name="phone"
             type="tel"
             required
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
@@ -242,6 +327,7 @@ export function NuovoOspite() {
           <div className="relative w-24">
             <input
               id="familyCount"
+              name="familyCount"
               type="number"
               min={0}
               required
@@ -290,7 +376,7 @@ export function NuovoOspite() {
         <div className="flex items-center gap-3">
           <label htmlFor="agency" className="min-w-28 text-sm font-semibold text-bianco">Ente segnalazione</label>
           <div className="relative w-full">
-            <EntitySelect/>
+            <EntitySelect />
             <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
               ▼
             </span>
@@ -403,11 +489,17 @@ export function NuovoOspite() {
         <div className="col-span-1 flex justify-end pt-2 lg:col-span-2">
           <button
             type="submit"
+            disabled={isSubmitting}
             className="h-10 rounded-md bg-amber-900 px-5 text-sm font-bold text-white shadow-lg transition-all hover:bg-amber-800 active:scale-95"
           >
-            REGISTRA
+            {isSubmitting ? "SALVATAGGIO..." : "REGISTRA"}
           </button>
         </div>
+        {errorNotice ? (
+          <p className="col-span-1 text-right text-xs font-semibold text-red-300 lg:col-span-2">
+            {errorNotice}
+          </p>
+        ) : null}
         {submitNotice ? (
           <p className="col-span-1 text-right text-xs font-semibold text-green-300 lg:col-span-2">
             {submitNotice}

@@ -38,6 +38,23 @@ type CreateUserProps = {
   role: Ruolo[]
 }
 
+type CreateGuestMeal = {
+  mealType: string
+  deliveryType: "mensa" | "asporto"
+}
+
+type CreateGuestProps = {
+  name: string
+  surname: string
+  resident: boolean
+  birthDate: string
+  familyCount: number
+  profession: string
+  phone: string
+  entityName: string
+  meals: CreateGuestMeal[]
+}
+
 function toArray<T>(value: T[] | T | null | undefined): T[] {
   if (Array.isArray(value)) return value
   if (value == null) return []
@@ -94,6 +111,15 @@ export async function createUser(utente: CreateUserProps): Promise<User | { erro
     return normalizeUser(userLoad);
   } catch (err) {
     return { error: "Errore durante la creazione dell'utente." };
+  }
+}
+
+export async function createGuest(guest: CreateGuestProps): Promise<{ status: "success" } | { error: string }> {
+  try {
+    await api.post("/guests", guest)
+    return { status: "success" }
+  } catch {
+    return { error: "Errore durante la creazione dell'ospite." }
   }
 }
 
