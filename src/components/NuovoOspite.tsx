@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { CalendarDays } from "lucide-react";
+import { getEntityNames, getMealTypes } from "../api/backend";
 
-type MealType = "standard" | "vegetariano" | "vegano" | "halal";
+type MealType = string;
 type DeliveryType = "" | "mensa" | "asporto";
 
 type MealRow = {
@@ -10,15 +11,55 @@ type MealRow = {
   consegna: DeliveryType;
 };
 
+export function EntitySelect() {
+  const [entities, setEntities] = useState<string[]>([]);
+
+  useEffect(() => {
+    getEntityNames().then(data => setEntities(data));
+  }, []);
+
+  return (
+  
+    <select
+            id="agency"
+            defaultValue=""
+            required
+            className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none"
+          >
+      <option value="" disabled>Seleziona ente</option>
+      {entities.map((entity) => (
+        <option key={entity} value={entity}>
+          {entity}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export function NuovoOspite() {
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [familyCount, setFamilyCount] = useState<number | "">("");
+  const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
   const [isMealWarningOpen, setIsMealWarningOpen] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
   const normalizedFamilyCount = familyCount === "" ? 0 : familyCount;
   const hasMealCountError =
     normalizedFamilyCount > 0 && mealRows.length < normalizedFamilyCount;
+
+  useEffect(() => {
+    getMealTypes().then((data) => setMealTypeOptions(data));
+  }, []);
+
+  useEffect(() => {
+    if (mealTypeOptions.length === 0) return;
+
+    setMealRows((currentRows) =>
+      currentRows.map((row) =>
+        row.tipo ? row : { ...row, tipo: mealTypeOptions[0] }
+      ),
+    );
+  }, [mealTypeOptions]);
 
   useEffect(() => {
     const targetRows = familyCount === "" ? 0 : Math.max(0, familyCount);
@@ -31,7 +72,7 @@ export function NuovoOspite() {
         let nextId = nextRows.length > 0 ? nextRows[nextRows.length - 1].id + 1 : 1;
 
         while (nextRows.length < targetRows) {
-          nextRows.push({ id: nextId, tipo: "standard", consegna: "" });
+          nextRows.push({ id: nextId, tipo: mealTypeOptions[0] ?? "", consegna: "" });
           nextId += 1;
         }
         return nextRows;
@@ -39,13 +80,13 @@ export function NuovoOspite() {
 
       return currentRows.slice(0, targetRows);
     });
-  }, [familyCount]);
+  }, [familyCount, mealTypeOptions]);
 
   const addMealRow = () => {
     setMealRows((currentRows) => {
       const nextId =
         currentRows.length > 0 ? currentRows[currentRows.length - 1].id + 1 : 1;
-      return [...currentRows, { id: nextId, tipo: "standard", consegna: "" }];
+      return [...currentRows, { id: nextId, tipo: mealTypeOptions[0] ?? "", consegna: "" }];
     });
   };
 
@@ -249,19 +290,7 @@ export function NuovoOspite() {
         <div className="flex items-center gap-3">
           <label htmlFor="agency" className="min-w-28 text-sm font-semibold text-bianco">Ente segnalazione</label>
           <div className="relative w-full">
-            <select
-              id="agency"
-              defaultValue=""
-              required
-              className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none"
-            >
-              <option value="" disabled>Seleziona ente</option>
-              <option value="caritas">Caritas</option>
-              <option value="comune">Comune</option>
-              <option value="asp">ASP</option>
-              <option value="associazione">Associazione</option>
-              <option value="altro">Altro</option>
-            </select>
+            <EntitySelect/>
             <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
               ▼
             </span>
@@ -326,13 +355,19 @@ export function NuovoOspite() {
                         <div className="relative">
                           <select
                             value={row.tipo}
-                            onChange={(event) => updateMealType(row.id, event.target.value as MealType)}
+                            onChange={(event) => updateMealType(row.id, event.target.value)}
+                            disabled={mealTypeOptions.length === 0}
                             className="h-8 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-8 pl-2 text-xs font-semibold text-bordeaux outline-none"
                           >
-                            <option value="standard">Standard</option>
-                            <option value="vegetariano">Vegetariano</option>
-                            <option value="vegano">Vegano</option>
-                            <option value="halal">Halal</option>
+                            {mealTypeOptions.length === 0 ? (
+                              <option value="">Caricamento...</option>
+                            ) : (
+                              mealTypeOptions.map((mealType) => (
+                                <option key={mealType} value={mealType}>
+                                  {mealType}
+                                </option>
+                              ))
+                            )}
                           </select>
                           <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-xs text-bordeaux">
                             ▼

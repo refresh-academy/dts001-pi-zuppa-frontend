@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { PuntoDiDistribuzione, Ruolo, User, Entity } from "../types/piuzuppa"
+import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal } from "../types/piuzuppa"
 
 const api = axios.create({
   baseURL: "/api",
@@ -130,9 +130,17 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function getEntityNames(): Promise<string[]> {
-  const entities: Entity[] = await api.get("/entities");
-  return entities.map(entity => entity.nome); 
+  const res = await api.get("/entities")
+  const entities = Array.isArray(res.data) ? (res.data as Entity[]) : []
+  return entities.map((entity) => entity.nome)
 }
+
+export async function getMealTypes(): Promise<string[]> {
+  const res = await api.get("/meal_types")
+  const mealTypes = Array.isArray(res.data) ? (res.data as Meal[]) : []
+  return mealTypes.map((mealType) => mealType.tipo)
+}
+
 
 export async function searchUsersByName(name: string): Promise<User[]> {
   const users = await getUsers();

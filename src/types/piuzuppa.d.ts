@@ -65,4 +65,7 @@ export type SidebarConfig = {
 
 }
 
+export type Meal = {
+    tipo: string
+}
 
