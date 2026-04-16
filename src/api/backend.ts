@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { PuntoDiDistribuzione, Ruolo, User } from "../types/piuzuppa"
+import type { PuntoDiDistribuzione, Ruolo, User, Entity } from "../types/piuzuppa"
 
 const api = axios.create({
   baseURL: "/api",
@@ -127,6 +127,11 @@ export async function deleteUser(id: string): Promise<DeleteUserResult> {
 export async function getUsers(): Promise<User[]> {
   const res = await api.get("/users")
   return extractUsers(res.data).map(normalizeUser)
+}
+
+export async function getEntityNames(): Promise<string[]> {
+  const entities: Entity[] = await api.get("/entities");
+  return entities.map(entity => entity.nome); 
 }
 
 export async function searchUsersByName(name: string): Promise<User[]> {
