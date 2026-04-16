@@ -1,47 +1,72 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RicercaTabella } from "./RicercaTabella";
 import { useNavigate } from "react-router";
+import { getGuests } from "../api/backend";
+import type { GuestSummary } from "../types/piuzuppa";
 
 const columns = [
   "Nome",
   "Cognome",
   "Data di nascita",
   "Telefono",
-  "Ente",
-  "Ricevimento pasto",
+  "N. familiari",
+  "Numero Pasti",
   "Residente",
-];
-
-const staticRows = [
-  {
-    id: "1",
-    data: ["Mario", "Rossi", "26/04/1985", "333 1234567", "Caritas", "Mensa", "No"],
-  },
-  {
-    id: "2",
-    data: ["Anna", "Bianchi", "15/06/1973", "348 7654321", "Comune", "Asporto", "Si"],
-  },
 ];
 
 export function GestioneOspiti() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [guests, setGuests] = useState<GuestSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const searchValue = searchTerm.trim().toLowerCase();
 
-  const filteredRows = staticRows.filter((row) =>
-    `${row.data[0]} ${row.data[1]}`
+  useEffect(() => {
+    const loadGuests = async () => {
+      const loadedGuests = await getGuests();
+      setGuests(loadedGuests);
+      setIsLoading(false);
+    };
+
+    void loadGuests();
+  }, []);
+
+  const filteredGuests = guests.filter((guest) =>
+    `${guest.nome} ${guest.cognome}`
       .toLowerCase()
       .includes(searchValue)
   );
 
-  const sortedRows = [...filteredRows].sort((a, b) =>
-    `${a.data[0]} ${a.data[1]}`.localeCompare(
-      `${b.data[0]} ${b.data[1]}`,
-      "it",
-      { sensitivity: "base" }
+  const sortedRows = [...filteredGuests]
+    .sort((a, b) =>
+      `${a.nome} ${a.cognome}`.localeCompare(
+        `${b.nome} ${b.cognome}`,
+        "it",
+        { sensitivity: "base" }
+      )
     )
-  );
+    .map((guest) => ({
+      id: guest.id,
+      data: [
+        guest.nome,
+        guest.cognome,
+        guest.dataNascita,
+        guest.telefono,
+        String(guest.numeroFamiliari),
+        String(guest.numeroPasti),
+        guest.residente ? "Si" : "No",
+      ],
+    }));
+
+  const tableRows = isLoading
+    ? [
+        {
+          id: "loading",
+          data: ["Caricamento...", "", "", "", "", "", ""],
+        },
+      ]
+    : sortedRows;
 
   const handleRowClick = (id: string) => {
     navigate(`/visualizza-ospite/${id}`);
@@ -51,14 +76,14 @@ export function GestioneOspiti() {
     <RicercaTabella
       title="Gestione Ospiti"
       columns={columns}
-      rows={sortedRows}
+      rows={tableRows}
       onSearchChange={setSearchTerm}
       searchLabel="Cerca ospite"
       searchPlaceholder="nome o cognome"
       showNewButton={true}
       newButtonLabel="Nuovo ospite"
       newButtonPath="/nuovo-ospite"
-      onRowClick={handleRowClick}
+      onRowClick={isLoading ? undefined : handleRowClick}
     />
   );
 }

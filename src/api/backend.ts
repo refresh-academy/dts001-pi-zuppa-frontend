@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal } from "../types/piuzuppa"
+import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal, GuestSummary } from "../types/piuzuppa"
 
 const api = axios.create({
   baseURL: "/api",
@@ -86,6 +86,30 @@ function normalizeUser(raw: any): User {
   };
 }
 
+function formatItalianDate(value: unknown): string {
+  if (typeof value !== "string" || value.trim() === "") return ""
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+
+  return date.toLocaleDateString("it-IT")
+}
+
+function normalizeGuestSummary(raw: any): GuestSummary {
+  const guestMeals = cleanPgArray(raw?.guest_meal)
+
+  return {
+    id: String(raw?.id ?? ""),
+    nome: String(raw?.nome ?? ""),
+    cognome: String(raw?.cognome ?? ""),
+    dataNascita: formatItalianDate(raw?.data_nascita),
+    telefono: String(raw?.telefono ?? ""),
+    numeroFamiliari: Number(raw?.numeri_famigliari ?? 0),
+    residente: Boolean(raw?.residente),
+    numeroPasti: guestMeals.length,
+  }
+}
+
 function extractUsers(usersLoad: any): any[] {
   if (Array.isArray(usersLoad)) return usersLoad
   if (Array.isArray(usersLoad?.users)) return usersLoad.users
@@ -153,6 +177,12 @@ export async function deleteUser(id: string): Promise<DeleteUserResult> {
 export async function getUsers(): Promise<User[]> {
   const res = await api.get("/users")
   return extractUsers(res.data).map(normalizeUser)
+}
+
+export async function getGuests(): Promise<GuestSummary[]> {
+  const res = await api.get("/guests")
+  const guests = Array.isArray(res.data) ? res.data : []
+  return guests.map(normalizeGuestSummary)
 }
 
 export async function getEntityNames(): Promise<string[]> {

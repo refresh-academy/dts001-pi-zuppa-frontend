@@ -69,3 +69,14 @@ export type Meal = {
     tipo: string
 }
 
+export type GuestSummary = {
+    id: string,
+    nome: string,
+    cognome: string,
+    dataNascita: string,
+    telefono: string,
+    numeroFamiliari: number,
+    residente: boolean,
+    numeroPasti: number
+}
+

@@ -88,20 +88,31 @@ export function RicercaTabella({
               </tr>
             </thead>
             <tbody className="bg-sabbia text-bordeaux">
-              {rows.map((row) => (
-                <tr
-                  key={row.id}
-                  onClick={onRowClick ? () => onRowClick(row.id) : undefined}
-                  className={`border-t-2 border-amber-900/40 ${onRowClick ? "cursor-pointer hover:bg-amber-100/70 transition-colors" : ""}`}
-                >
-                  <td className="px-4 py-3"></td>
-                  {row.data.map((cell, i) => (
-                    <td key={i} className="px-4 py-3">
-                      {cell}
-                    </td>
-                  ))}
+              {rows.length === 0 ? (
+                <tr className="border-t-2 border-amber-900/40">
+                  <td
+                    colSpan={columns.length + 1}
+                    className="px-4 py-6 text-center text-bordeaux/75"
+                  >
+                    Nessun risultato trovato.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    onClick={onRowClick ? () => onRowClick(row.id) : undefined}
+                    className={`border-t-2 border-amber-900/40 ${onRowClick ? "cursor-pointer hover:bg-amber-100/70 transition-colors" : ""}`}
+                  >
+                    <td className="px-4 py-3"></td>
+                    {row.data.map((cell, i) => (
+                      <td key={i} className="px-4 py-3">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
