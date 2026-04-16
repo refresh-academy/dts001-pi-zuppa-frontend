@@ -80,3 +80,22 @@ export type GuestSummary = {
     numeroPasti: number
 }
 
+export type GuestMealDetail = {
+    id: number,
+    mealType: string,
+    deliveryType: "" | "mensa" | "asporto"
+}
+
+export type GuestDetail = {
+    id: string,
+    nome: string,
+    cognome: string,
+    residente: boolean,
+    dataNascita: string,
+    numeroFamiliari: number,
+    professione: string,
+    telefono: string,
+    enteSegnalazione: string,
+    pasti: GuestMealDetail[]
+}
+

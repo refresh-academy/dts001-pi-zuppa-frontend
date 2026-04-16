@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal, GuestSummary } from "../types/piuzuppa"
+import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal, GuestSummary, GuestDetail, GuestMealDetail } from "../types/piuzuppa"
 
 const api = axios.create({
   baseURL: "/api",
@@ -110,6 +110,33 @@ function normalizeGuestSummary(raw: any): GuestSummary {
   }
 }
 
+function normalizeGuestDetail(raw: any): GuestDetail {
+  const mealsRaw = Array.isArray(raw?.meals) ? raw.meals : []
+  const pasti: GuestMealDetail[] = mealsRaw.map((meal: any, index: number) => ({
+    id: Number(meal?.id ?? index + 1),
+    mealType: String(meal?.meal_type ?? meal?.mealType ?? ""),
+    deliveryType: String(
+      meal?.delivery_type ?? meal?.deliveryType ?? "",
+    ) as GuestMealDetail["deliveryType"],
+  }))
+
+  return {
+    id: String(raw?.id ?? ""),
+    nome: String(raw?.nome ?? ""),
+    cognome: String(raw?.cognome ?? ""),
+    residente: Boolean(raw?.residente),
+    dataNascita:
+      typeof raw?.data_nascita === "string"
+        ? raw.data_nascita.slice(0, 10)
+        : "",
+    numeroFamiliari: Number(raw?.numeri_famigliari ?? 0),
+    professione: String(raw?.professione ?? ""),
+    telefono: String(raw?.telefono ?? ""),
+    enteSegnalazione: String(raw?.entity_name ?? ""),
+    pasti,
+  }
+}
+
 function extractUsers(usersLoad: any): any[] {
   if (Array.isArray(usersLoad)) return usersLoad
   if (Array.isArray(usersLoad?.users)) return usersLoad.users
@@ -183,6 +210,15 @@ export async function getGuests(): Promise<GuestSummary[]> {
   const res = await api.get("/guests")
   const guests = Array.isArray(res.data) ? res.data : []
   return guests.map(normalizeGuestSummary)
+}
+
+export async function fetchGuestToChange(id: string): Promise<GuestDetail | null> {
+  try {
+    const res = await api.get(`/guests/${id}`)
+    return normalizeGuestDetail(res.data)
+  } catch {
+    return null
+  }
 }
 
 export async function getEntityNames(): Promise<string[]> {

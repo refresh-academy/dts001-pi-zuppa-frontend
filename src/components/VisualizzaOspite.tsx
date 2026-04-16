@@ -12,9 +12,10 @@ import {
   Trash2,
   Undo2,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { fetchGuestToChange, getEntityNames, getMealTypes } from "../api/backend";
 
-type MealType = "standard" | "vegetariano" | "vegano" | "halal";
+type MealType = string;
 type DeliveryType = "" | "mensa" | "asporto";
 
 type MealRow = {
@@ -23,9 +24,33 @@ type MealRow = {
   consegna: DeliveryType;
 };
 
+type GuestFormState = {
+  nome: string;
+  cognome: string;
+  dataNascita: string;
+  residente: boolean;
+  professione: string;
+  telefono: string;
+  enteSegnalazione: string;
+};
+
+const initialFormData: GuestFormState = {
+  nome: "",
+  cognome: "",
+  dataNascita: "",
+  residente: true,
+  professione: "",
+  telefono: "",
+  enteSegnalazione: "",
+};
+
 export function VisualizzaOspite() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const [formData, setFormData] = useState<GuestFormState>(initialFormData);
+  const [entityOptions, setEntityOptions] = useState<string[]>([]);
+  const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [familyCount, setFamilyCount] = useState<number | "">("");
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
   const [isMealWarningOpen, setIsMealWarningOpen] = useState(false);
@@ -33,10 +58,57 @@ export function VisualizzaOspite() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [guestFound, setGuestFound] = useState(true);
 
   const normalizedFamilyCount = familyCount === "" ? 0 : familyCount;
   const hasMealCountError =
     normalizedFamilyCount > 0 && mealRows.length < normalizedFamilyCount;
+  const isFormDisabled = !isEditing;
+
+  useEffect(() => {
+    getEntityNames().then((data) => setEntityOptions(data));
+    getMealTypes().then((data) => setMealTypeOptions(data));
+  }, []);
+
+  useEffect(() => {
+    const loadGuest = async () => {
+      if (!id) {
+        setGuestFound(false);
+        setIsLoading(false);
+        return;
+      }
+
+      const guest = await fetchGuestToChange(id);
+      if (!guest) {
+        setGuestFound(false);
+        setIsLoading(false);
+        return;
+      }
+
+      setFormData({
+        nome: guest.nome,
+        cognome: guest.cognome,
+        dataNascita: guest.dataNascita,
+        residente: guest.residente,
+        professione: guest.professione,
+        telefono: guest.telefono,
+        enteSegnalazione: guest.enteSegnalazione,
+      });
+      setFamilyCount(guest.numeroFamiliari);
+      setMealRows(
+        guest.pasti.map((meal, index) => ({
+          id: meal.id || index + 1,
+          tipo: meal.mealType,
+          consegna: meal.deliveryType,
+        })),
+      );
+      setGuestFound(true);
+      setIsLoading(false);
+    };
+
+    void loadGuest();
+  }, [id]);
 
   useEffect(() => {
     const targetRows = familyCount === "" ? 0 : Math.max(0, familyCount);
@@ -49,7 +121,7 @@ export function VisualizzaOspite() {
         let nextId = nextRows.length > 0 ? nextRows[nextRows.length - 1].id + 1 : 1;
 
         while (nextRows.length < targetRows) {
-          nextRows.push({ id: nextId, tipo: "standard", consegna: "" });
+          nextRows.push({ id: nextId, tipo: mealTypeOptions[0] ?? "", consegna: "" });
           nextId += 1;
         }
 
@@ -58,14 +130,14 @@ export function VisualizzaOspite() {
 
       return currentRows.slice(0, targetRows);
     });
-  }, [familyCount]);
+  }, [familyCount, mealTypeOptions]);
 
   const addMealRow = () => {
     setMealRows((currentRows) => {
       const nextId =
         currentRows.length > 0 ? currentRows[currentRows.length - 1].id + 1 : 1;
 
-      return [...currentRows, { id: nextId, tipo: "standard", consegna: "" }];
+      return [...currentRows, { id: nextId, tipo: mealTypeOptions[0] ?? "", consegna: "" }];
     });
   };
 
@@ -130,6 +202,14 @@ export function VisualizzaOspite() {
     setIsDeleting(true);
     window.setTimeout(() => setIsDeleting(false), 700);
   };
+
+  if (isLoading) {
+    return <p className="px-8 pt-8 text-bianco">Caricamento dati ospite...</p>;
+  }
+
+  if (!guestFound) {
+    return <p className="px-8 pt-8 text-bianco">Ospite non trovato.</p>;
+  }
 
   return (
     <div
@@ -203,6 +283,11 @@ export function VisualizzaOspite() {
           <input
             id="name"
             type="text"
+            value={formData.nome}
+            onChange={(event) =>
+              setFormData((current) => ({ ...current, nome: event.target.value }))
+            }
+            disabled={isFormDisabled}
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
           />
         </div>
@@ -212,6 +297,11 @@ export function VisualizzaOspite() {
           <input
             id="surname"
             type="text"
+            value={formData.cognome}
+            onChange={(event) =>
+              setFormData((current) => ({ ...current, cognome: event.target.value }))
+            }
+            disabled={isFormDisabled}
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
           />
         </div>
@@ -223,6 +313,11 @@ export function VisualizzaOspite() {
               ref={dateInputRef}
               id="dob"
               type="date"
+              value={formData.dataNascita}
+              onChange={(event) =>
+                setFormData((current) => ({ ...current, dataNascita: event.target.value }))
+              }
+              disabled={isFormDisabled}
               className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none [&::-webkit-calendar-picker-indicator]:opacity-0"
             />
             <button
@@ -242,11 +337,31 @@ export function VisualizzaOspite() {
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-bianco">
               <span className="text-sm font-semibold">Si</span>
-              <input type="radio" name="residenza" value="si" className="h-5 w-5 accent-bordeaux" />
+              <input
+                type="radio"
+                name="residenza"
+                value="si"
+                checked={formData.residente}
+                onChange={() =>
+                  setFormData((current) => ({ ...current, residente: true }))
+                }
+                disabled={isFormDisabled}
+                className="h-5 w-5 accent-bordeaux"
+              />
             </label>
             <label className="flex items-center gap-2 text-bianco">
               <span className="text-sm font-semibold">No</span>
-              <input type="radio" name="residenza" value="no" className="h-5 w-5 accent-bordeaux" />
+              <input
+                type="radio"
+                name="residenza"
+                value="no"
+                checked={!formData.residente}
+                onChange={() =>
+                  setFormData((current) => ({ ...current, residente: false }))
+                }
+                disabled={isFormDisabled}
+                className="h-5 w-5 accent-bordeaux"
+              />
             </label>
           </div>
         </div>
@@ -256,6 +371,11 @@ export function VisualizzaOspite() {
           <input
             id="profession"
             type="text"
+            value={formData.professione}
+            onChange={(event) =>
+              setFormData((current) => ({ ...current, professione: event.target.value }))
+            }
+            disabled={isFormDisabled}
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
           />
         </div>
@@ -265,6 +385,11 @@ export function VisualizzaOspite() {
           <input
             id="phone"
             type="tel"
+            value={formData.telefono}
+            onChange={(event) =>
+              setFormData((current) => ({ ...current, telefono: event.target.value }))
+            }
+            disabled={isFormDisabled}
             className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
           />
         </div>
@@ -288,6 +413,7 @@ export function VisualizzaOspite() {
                   setFamilyCount(numericValue);
                 }
               }}
+              disabled={isFormDisabled}
               className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia pl-2.5 pr-8 text-sm text-bordeaux outline-none [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <div className="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col gap-0.5">
@@ -298,6 +424,7 @@ export function VisualizzaOspite() {
                     currentValue === "" ? 1 : currentValue + 1,
                   )
                 }
+                disabled={isFormDisabled}
                 className="h-[15px] w-5 rounded-[3px] border border-bordeaux bg-giallo text-[9px] font-bold leading-none text-bordeaux"
               >
                 <ChevronUp size={10} strokeWidth={2.8} className="mx-auto" />
@@ -310,6 +437,7 @@ export function VisualizzaOspite() {
                     return currentValue - 1;
                   })
                 }
+                disabled={isFormDisabled}
                 className="h-[15px] w-5 rounded-[3px] border border-bordeaux bg-giallo text-[9px] font-bold leading-none text-bordeaux"
               >
                 <ChevronDown size={10} strokeWidth={2.8} className="mx-auto" />
@@ -323,15 +451,19 @@ export function VisualizzaOspite() {
           <div className="relative w-full">
             <select
               id="agency"
-              defaultValue=""
+              value={formData.enteSegnalazione}
+              onChange={(event) =>
+                setFormData((current) => ({ ...current, enteSegnalazione: event.target.value }))
+              }
+              disabled={isFormDisabled}
               className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pl-2.5 pr-10 text-sm text-bordeaux outline-none"
             >
               <option value="" disabled>Seleziona ente</option>
-              <option value="caritas">Caritas</option>
-              <option value="comune">Comune</option>
-              <option value="asp">ASP</option>
-              <option value="associazione">Associazione</option>
-              <option value="altro">Altro</option>
+              {entityOptions.map((entityName) => (
+                <option key={entityName} value={entityName}>
+                  {entityName}
+                </option>
+              ))}
             </select>
             <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
               <ChevronDown size={12} strokeWidth={2.8} />
@@ -346,7 +478,7 @@ export function VisualizzaOspite() {
               <button
                 type="button"
                 onClick={removeMealRow}
-                disabled={mealRows.length <= 0}
+                disabled={mealRows.length <= 0 || isFormDisabled}
                 className="h-7 w-7 rounded-md border-2 border-bordeaux bg-giallo text-lg font-bold leading-none text-bordeaux shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Rimuovi riga pasto"
                 title="Rimuovi riga pasto"
@@ -356,7 +488,8 @@ export function VisualizzaOspite() {
               <button
                 type="button"
                 onClick={addMealRow}
-                className="h-7 w-7 rounded-md border-2 border-bordeaux bg-giallo text-lg font-bold leading-none text-bordeaux shadow-sm transition hover:brightness-105"
+                disabled={isFormDisabled}
+                className="h-7 w-7 rounded-md border-2 border-bordeaux bg-giallo text-lg font-bold leading-none text-bordeaux shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Aggiungi riga pasto"
                 title="Aggiungi riga pasto"
               >
@@ -397,13 +530,15 @@ export function VisualizzaOspite() {
                         <div className="relative">
                           <select
                             value={row.tipo}
-                            onChange={(event) => updateMealType(row.id, event.target.value as MealType)}
+                            onChange={(event) => updateMealType(row.id, event.target.value)}
+                            disabled={isFormDisabled || mealTypeOptions.length === 0}
                             className="h-8 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pl-2 pr-8 text-xs font-semibold text-bordeaux outline-none"
                           >
-                            <option value="standard">Standard</option>
-                            <option value="vegetariano">Vegetariano</option>
-                            <option value="vegano">Vegano</option>
-                            <option value="halal">Halal</option>
+                            {mealTypeOptions.map((mealType) => (
+                              <option key={mealType} value={mealType}>
+                                {mealType}
+                              </option>
+                            ))}
                           </select>
                           <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-bordeaux">
                             <ChevronDown size={12} strokeWidth={2.8} />
@@ -416,6 +551,7 @@ export function VisualizzaOspite() {
                           name={`consegna-${row.id}`}
                           checked={row.consegna === "mensa"}
                           onChange={() => updateMealDelivery(row.id, "mensa")}
+                          disabled={isFormDisabled}
                           className="h-4 w-4 accent-bordeaux"
                         />
                       </td>
@@ -425,6 +561,7 @@ export function VisualizzaOspite() {
                           name={`consegna-${row.id}`}
                           checked={row.consegna === "asporto"}
                           onChange={() => updateMealDelivery(row.id, "asporto")}
+                          disabled={isFormDisabled}
                           className="h-4 w-4 accent-bordeaux"
                         />
                       </td>
