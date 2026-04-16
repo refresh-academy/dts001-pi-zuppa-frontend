@@ -12,6 +12,13 @@ export type User = {
     ruoli: Ruolo[]
 }
 
+export type Entity = {
+    id: string,
+    nome: string,
+    telefono: string,
+    via: string
+}
+
 export type PuntoDiDistribuzione =
     | "Saffi"
     | "Battiferro"
