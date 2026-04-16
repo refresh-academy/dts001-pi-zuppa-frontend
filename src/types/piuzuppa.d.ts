@@ -46,7 +46,7 @@ type Pasto = {
 
 
 export type SidebarOption =
-    | "anagrafiche"
+    | "ospiti"
     | "magazzino"
     | "cucina"
     | "accoglienza"

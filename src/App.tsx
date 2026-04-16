@@ -5,7 +5,7 @@ import { Navigate, Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
 import {  NuovoUtente } from "./components/NuovoUtente"
-import { GestioneOspiti, } from "./components/GestioneAnagrafiche"
+import { GestioneOspiti } from "./components/GestioneOspiti"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
@@ -15,9 +15,9 @@ import { useAuth } from "./components/AuthContext"
 
 const sidebarItems: SidebarConfig[] = [
   {
-    key: "anagrafiche",
-    label: "Anagrafiche",
-    path: "anagrafiche",
+    key: "ospiti",
+    label: "Ospiti",
+    path: "ospiti",
     subItems : [
       {label: "Inserimento nuovo ospite", path: "nuovo-ospite"},
       {label: "Anagrafica Ospiti", path: "anagrafica-ospiti"},
