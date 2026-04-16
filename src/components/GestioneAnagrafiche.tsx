@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RicercaTabella } from "./RicercaTabella";
+import { useNavigate } from "react-router";
 
 const columns = [
   "Nome",
@@ -23,6 +24,7 @@ const staticRows = [
 ];
 
 export function GestioneOspiti() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
   const searchValue = searchTerm.trim().toLowerCase();
@@ -41,6 +43,10 @@ export function GestioneOspiti() {
     )
   );
 
+  const handleRowClick = (id: string) => {
+    navigate(`/visualizza-ospite/${id}`);
+  };
+
   return (
     <RicercaTabella
       title="Gestione Ospiti"
@@ -52,6 +58,7 @@ export function GestioneOspiti() {
       showNewButton={true}
       newButtonLabel="Nuovo ospite"
       newButtonPath="/nuovo-ospite"
+      onRowClick={handleRowClick}
     />
   );
 }

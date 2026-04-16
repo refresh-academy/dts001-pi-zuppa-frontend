@@ -9,6 +9,7 @@ import { GestioneOspiti, } from "./components/GestioneAnagrafiche"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
+import { VisualizzaOspite } from "./components/VisualizzaOspite"
 import { Tendone } from "./components/TopBar"
 import { useAuth } from "./components/AuthContext"
 
@@ -201,6 +202,19 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <VisualizzaUtente />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }/>
+          <Route
+            path="visualizza-ospite/:id"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <VisualizzaOspite />
                   </div>
                 </>
               </ProtectedRoute>
