@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { CalendarDays } from "lucide-react";
-import { createGuest, getEntityNames, getMealTypes } from "../api/backend";
+import { createGuest, getEntityNames, getMealTypes, getSiteNames } from "../api/backend";
 
 type MealType = string;
 type DeliveryType = "" | "mensa" | "asporto";
@@ -12,6 +12,11 @@ type MealRow = {
 };
 
 type EntitySelectProps = {
+  id?: string
+  name?: string
+}
+
+type SiteSelectProps = {
   id?: string
   name?: string
 }
@@ -36,6 +41,31 @@ export function EntitySelect({ id = "agency", name = "agency" }: EntitySelectPro
       {entities.map((entity) => (
         <option key={entity} value={entity}>
           {entity}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function SiteSelect({ id = "site", name = "site" }: SiteSelectProps) {
+  const [sites, setSites] = useState<string[]>([]);
+
+  useEffect(() => {
+    getSiteNames().then((data) => setSites(data));
+  }, []);
+
+  return (
+    <select
+      id={id}
+      name={name}
+      defaultValue=""
+      required
+      className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pr-10 pl-2.5 text-sm text-bordeaux outline-none"
+    >
+      <option value="" disabled>Seleziona punto</option>
+      {sites.map((site) => (
+        <option key={site} value={site}>
+          {site}
         </option>
       ))}
     </select>
@@ -142,6 +172,7 @@ export function NuovoOspite() {
     const professionValue = formData.get("profession")
     const phoneValue = formData.get("phone")
     const entityNameValue = formData.get("agency")
+    const siteNameValue = formData.get("site")
 
     if (
       typeof familyCountValue !== "string" ||
@@ -151,7 +182,8 @@ export function NuovoOspite() {
       typeof residentValue !== "string" ||
       typeof professionValue !== "string" ||
       typeof phoneValue !== "string" ||
-      typeof entityNameValue !== "string"
+      typeof entityNameValue !== "string" ||
+      typeof siteNameValue !== "string"
     ) {
       setErrorNotice("Compila tutti i campi obbligatori.")
       return
@@ -170,6 +202,7 @@ export function NuovoOspite() {
       profession: professionValue.trim(),
       phone: phoneValue.trim(),
       entityName: entityNameValue,
+      siteName: siteNameValue,
       meals: mealRows.map((row) => ({
         mealType: row.tipo,
         deliveryType: row.consegna as Exclude<DeliveryType, "">,
@@ -377,6 +410,16 @@ export function NuovoOspite() {
           <label htmlFor="agency" className="min-w-28 text-sm font-semibold text-bianco">Ente segnalazione</label>
           <div className="relative w-full">
             <EntitySelect />
+            <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
+              ▼
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="site" className="min-w-28 text-sm font-semibold text-bianco">Punto di Distribuzione</label>
+          <div className="relative w-full">
+            <SiteSelect />
             <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
               ▼
             </span>

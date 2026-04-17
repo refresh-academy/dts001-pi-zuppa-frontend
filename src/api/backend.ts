@@ -52,6 +52,7 @@ type CreateGuestProps = {
   profession: string
   phone: string
   entityName: string
+  siteName: string
   meals: CreateGuestMeal[]
 }
 
@@ -225,6 +226,14 @@ export async function getEntityNames(): Promise<string[]> {
   const res = await api.get("/entities")
   const entities = Array.isArray(res.data) ? (res.data as Entity[]) : []
   return entities.map((entity) => entity.nome)
+}
+
+export async function getSiteNames(): Promise<string[]> {
+  const res = await api.get("/sites")
+  const sites = Array.isArray(res.data) ? res.data : []
+  return sites
+    .map((site) => String(site?.nome ?? "").trim())
+    .filter((siteName) => siteName !== "")
 }
 
 export async function getMealTypes(): Promise<string[]> {
