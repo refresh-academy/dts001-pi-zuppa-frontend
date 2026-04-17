@@ -4,12 +4,13 @@ import { Sidebar } from "./components/Sidebar"
 import { Navigate, Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
-import {  NuovoUtente } from "./components/NuovoUtente"
+import { NuovoUtente } from "./components/NuovoUtente"
 import { GestioneOspiti } from "./components/GestioneOspiti"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { VisualizzaOspite } from "./components/VisualizzaOspite"
+import { GestioneEnti } from "./components/GestioneEnti"
 import { Tendone } from "./components/TopBar"
 import { useAuth } from "./components/AuthContext"
 
@@ -18,21 +19,21 @@ const sidebarItems: SidebarConfig[] = [
     key: "ospiti",
     label: "Ospiti",
     path: "ospiti",
-    subItems : [
-      {label: "Inserimento nuovo ospite", path: "nuovo-ospite"},
-      {label: "Anagrafica Ospiti", path: "anagrafica-ospiti"},
-      {label: "Anagrafica enti", path: "anagrafica-enti"}
+    subItems: [
+      { label: "Inserimento nuovo ospite", path: "nuovo-ospite" },
+      { label: "Anagrafica Ospiti", path: "anagrafica-ospiti" },
+      { label: "Anagrafica enti", path: "anagrafica-enti" }
 
-]
+    ]
   },
   {
     key: "magazzino",
     label: "Magazzino",
     path: "magazzino",
-    subItems : [
-      {label: "Giacenze", path: "giacenze"},
-      {label: "Stoccaggio", path: "stoccaggio"},
-      {label: "Prelievo", path: "prelievo"}
+    subItems: [
+      { label: "Giacenze", path: "giacenze" },
+      { label: "Stoccaggio", path: "stoccaggio" },
+      { label: "Prelievo", path: "prelievo" }
     ]
   },
   {
@@ -49,9 +50,9 @@ const sidebarItems: SidebarConfig[] = [
     key: "utenti",
     label: "Utenti",
     path: "utenti",
-    subItems : [
-      {label: "Inserimento nuovo utente", path: "nuovo-utente"},
-      {label: "Anagrafica utenti", path: "utenti"}
+    subItems: [
+      { label: "Inserimento nuovo utente", path: "nuovo-utente" },
+      { label: "Anagrafica utenti", path: "utenti" }
     ]
   },
 ]
@@ -105,7 +106,7 @@ function App() {
                           Ciao{user?.nome ? `, ${user.nome}` : ""}!
                         </h1>
                         <p className="mt-3 text-bordeaux/90">
-                         Siamo felici di averti qui!
+                          Siamo felici di averti qui!
                         </p>
                         <div className="mt-6 rounded-xl bg-white/55 p-4 shadow-md">
                           <p className="font-bold text-bordeaux">Come orientarti rapidamente:</p>
@@ -132,6 +133,7 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <GestioneOspiti />
+                    <GestioneEnti />
                   </div>
                 </>
               </ProtectedRoute>
@@ -151,7 +153,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="nuovo-ospite"
             element={
@@ -166,7 +168,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="nuovo-utente"
             element={
               <ProtectedRoute>
@@ -192,7 +194,7 @@ function App() {
                   </div>
                 </>
               </ProtectedRoute>
-            }/>
+            } />
           <Route
             path="visualizza-utente/:id"
             element={
@@ -205,7 +207,7 @@ function App() {
                   </div>
                 </>
               </ProtectedRoute>
-            }/>
+            } />
           <Route
             path="visualizza-ospite/:id"
             element={
@@ -218,7 +220,7 @@ function App() {
                   </div>
                 </>
               </ProtectedRoute>
-            }/>
+            } />
           <Route
             path="magazzino"
             element={
@@ -231,7 +233,7 @@ function App() {
                   </div>
                 </>
               </ProtectedRoute>
-            }/>
+            } />
           <Route
             path="giacenze"
             element={
@@ -244,9 +246,8 @@ function App() {
                   </div>
                 </>
               </ProtectedRoute>
-            }/>
+            } />
           <Route path="*" element={<Navigate to="/" replace />} />
-        
         </Routes>
       </main>
     </>

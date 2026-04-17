@@ -1,0 +1,25 @@
+import { fetchUserToChange, getInitialUsers } from "../api/backend"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { RicercaTabella } from "./RicercaTabella"
+import { User } from "../types/piuzuppa";
+
+const columns = ['Nome ente', 'e-mail', 'telefono', 'indirizzo'];
+
+const staticRows = [
+    { id: '1', data: ['Caritas', 'caritas@email.it', '051 5815663', 'via avesella 15'] },
+    { id: '2', data: ['CSM', 'mazzacorati@email.it', '051783456', 'via toscana 18'] },
+    { id: '3', data: ['Comune di Bologna', 'comunebologna@email.it', '051891273', 'Piazza Maggiore 1'] },
+];
+
+export function GestioneEnti() {
+    return (
+        <RicercaTabella
+            title="Gestione Enti"
+            columns={columns}
+            rows={staticRows}
+            onSearchChange={function (value: string): void {
+                throw new Error("Function not implemented.");
+            }} />
+    );
+}
