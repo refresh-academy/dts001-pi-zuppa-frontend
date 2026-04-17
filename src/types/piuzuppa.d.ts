@@ -19,11 +19,7 @@ export type Entity = {
     via: string
 }
 
-export type PuntoDiDistribuzione =
-    | "Saffi"
-    | "Battiferro"
-    | "San Donato"
-    | "Savena"
+export type PuntoDiDistribuzione = string
 
 export type Ruolo = "cucina" | "magazzino" | "accoglienza"
 

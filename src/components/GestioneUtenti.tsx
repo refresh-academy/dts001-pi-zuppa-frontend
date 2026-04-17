@@ -77,6 +77,8 @@ export function GestioneUtenti() {
     navigate(`/visualizza-utente/${id}`);
   };
 
+  // Legacy branch kept for now: editing currently happens in VisualizzaUtente,
+  // because RicercaTabella does not expose an active edit action.
   if (editingUser) {
     return <ModificaUtente {...editingUser} onSave={handleSave} />;
   }

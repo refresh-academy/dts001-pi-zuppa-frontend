@@ -4,13 +4,7 @@ import { ShieldCheck, ShieldX, SquarePen, Trash2, Undo2 } from "lucide-react"
 import { deleteUser, fetchUserToChange, modifyUser } from "../api/backend"
 import { useAuth } from "./AuthContext"
 import type { PuntoDiDistribuzione, Ruolo, User } from "../types/piuzuppa"
-
-const puntiDistribuzioneOptions: PuntoDiDistribuzione[] = [
-  "Saffi",
-  "Battiferro",
-  "Savena",
-  "San Donato",
-]
+import { SiteMultiSelect } from "./SiteMultiSelect"
 
 const ruoliOptions: Ruolo[] = ["cucina", "magazzino", "accoglienza"]
 
@@ -87,19 +81,6 @@ export function VisualizzaUtente() {
   }, [id])
 
   const isFormDisabled = !isEditing || isDeleted || isDeleting || isSaving
-
-  const toggleSite = (site: PuntoDiDistribuzione) => {
-    setFormData((current) => {
-      if (!current) return current
-      const isSelected = current.puntiDistribuzione.includes(site)
-      return {
-        ...current,
-        puntiDistribuzione: isSelected
-          ? current.puntiDistribuzione.filter((item) => item !== site)
-          : [...current.puntiDistribuzione, site],
-      }
-    })
-  }
 
   const toggleRuolo = (ruolo: Ruolo) => {
     setFormData((current) => {
@@ -483,21 +464,15 @@ export function VisualizzaUtente() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <label className="text-bianco text-sm font-semibold">Punto di distribuzione</label>
-            <div className="flex gap-6">
-              {puntiDistribuzioneOptions.map((option) => (
-                <label key={option} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.puntiDistribuzione.includes(option)}
-                    onChange={() => toggleSite(option)}
-                    disabled={isFormDisabled}
-                    className="h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia accent-amber-900"
-                  />
-                  <span className="text-bianco">{option}</span>
-                </label>
-              ))}
-            </div>
+            <SiteMultiSelect
+              label="Punto di distribuzione"
+              selectedSites={formData.puntiDistribuzione}
+              onChange={(sites) =>
+                setFormData((current) =>
+                  current ? { ...current, puntiDistribuzione: sites } : current
+                )
+              }
+            />
           </div>
 
           <div className="flex flex-col gap-3">
