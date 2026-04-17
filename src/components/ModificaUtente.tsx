@@ -7,6 +7,7 @@ import type {
 } from "../types/piuzuppa"
 import { Eye, EyeOff } from "lucide-react"
 import { useAuth } from "./AuthContext"
+import { SiteMultiSelect } from "./SiteMultiSelect"
 
 type ModificaUtenteProps = User & {
   onSave: (updatedUser: User) => void
@@ -16,6 +17,8 @@ export function ModificaUtente({
     onSave,
     ...userToChange
 }: ModificaUtenteProps) {
+    // Currently not reachable from the active app flow.
+    // User editing is handled through VisualizzaUtente instead.
     const { syncUser } = useAuth()
     const [newName, setName] = useState(userToChange.nome)
     const [newSurname, setSurname] = useState(userToChange.cognome)
@@ -199,32 +202,11 @@ export function ModificaUtente({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <label className="text-bianco text-sm font-semibold">Punto di distribuzione:</label>
-          <div className="flex gap-6">
-            {['Saffi', 'Battiferro', 'Savena', 'San Donato'].map((option) => (
-              <label key={option} className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                  <input 
-                    checked={newSite.includes(option as PuntoDiDistribuzione)}
-                    onChange={() => toggleSelection(newSite, option as PuntoDiDistribuzione, setSite)}
-                    id="site"
-                    type="checkbox" 
-                    name="site"
-                    value={option}
-                    className="peer appearance-none h-6 w-6 rounded-md border-2 border-bordeaux bg-sabbia checked:border-amber-500 checked:bg-amber-900 transition-all"
-                  />
-                  <div className="pointer-events-none absolute text-sm font-bold text-white opacity-0 peer-checked:opacity-100 transition-opacity">
-                    ✓
-                  </div>
-                </div>
-                <span className="text-bianco capitalize group-hover:text-giallo transition-colors">
-                  {option}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
+        <SiteMultiSelect
+          label="Punto di distribuzione"
+          selectedSites={newSite}
+          onChange={setSite}
+        />
 
        <div className="flex flex-col gap-3">
           <label className="text-bianco text-sm font-semibold">Ruolo:</label>
