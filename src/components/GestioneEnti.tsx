@@ -13,13 +13,27 @@ const staticRows = [
 ];
 
 export function GestioneEnti() {
+    const [rows, setRows] = useState<Ente[]>(staticRows);
+
+    const handleSearch = (value: string) => {
+        const filtered = staticRows.filter(ente =>
+            Object.values(ente).some(val =>
+                val.toLowerRows().includes(value.toLowerRows())
+            )
+        );
+
+        setRows(filtered);
+    };
+
     return (
         <RicercaTabella
             title="Gestione Enti"
             columns={columns}
-            rows={staticRows}
-            onSearchChange={function (value: string): void {
-                throw new Error("Function not implemented.");
-            }} />
+            rows={rows.map(r => ({
+                id: r.id,
+                data: [r.nome, r.email, r.telefono, r.indirizzo]
+            }))}
+            onSearchChange={handleSearch}
+        />
     );
 }
