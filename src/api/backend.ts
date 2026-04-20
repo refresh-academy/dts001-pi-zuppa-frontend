@@ -1,5 +1,14 @@
 import axios from "axios"
-import type { PuntoDiDistribuzione, Ruolo, User, Entity, Meal, GuestSummary, GuestDetail, GuestMealDetail } from "../types/piuzuppa"
+import type {
+  PuntoDiDistribuzione,
+  Ruolo,
+  User,
+  Ente,
+  Meal,
+  GuestSummary,
+  GuestDetail,
+  GuestMealDetail,
+} from "../types/piuzuppa"
 
 const api = axios.create({
   baseURL: "/api",
@@ -66,6 +75,13 @@ type UpdateGuestProps = {
   phone: string
   entityName: string
   meals: CreateGuestMeal[]
+}
+
+type CreateEnteProps = {
+  nome: string
+  email: string
+  telefono: string
+  indirizzo: string
 }
 
 function toArray<T>(value: T[] | T | null | undefined): T[] {
@@ -150,11 +166,29 @@ function normalizeGuestDetail(raw: any): GuestDetail {
   }
 }
 
+function normalizeEnte(raw: any): Ente {
+  return {
+    id: String(raw?.id ?? ""),
+    nome: String(raw?.nome ?? raw?.name ?? ""),
+    email: String(raw?.email ?? raw?.mail ?? ""),
+    telefono: String(raw?.telefono ?? raw?.phone ?? ""),
+    indirizzo: String(raw?.indirizzo ?? raw?.via ?? raw?.address ?? ""),
+  }
+}
+
 function extractUsers(usersLoad: any): any[] {
   if (Array.isArray(usersLoad)) return usersLoad
   if (Array.isArray(usersLoad?.users)) return usersLoad.users
   if (Array.isArray(usersLoad?.data?.users)) return usersLoad.data.users
   if (Array.isArray(usersLoad?.data)) return usersLoad.data
+  return []
+}
+
+function extractEntities(entitiesLoad: any): any[] {
+  if (Array.isArray(entitiesLoad)) return entitiesLoad
+  if (Array.isArray(entitiesLoad?.entities)) return entitiesLoad.entities
+  if (Array.isArray(entitiesLoad?.data?.entities)) return entitiesLoad.data.entities
+  if (Array.isArray(entitiesLoad?.data)) return entitiesLoad.data
   return []
 }
 
@@ -225,6 +259,64 @@ export async function deleteGuest(id: string): Promise<DeleteGuestResult> {
   }
 }
 
+export async function createEnte(ente: CreateEnteProps): Promise<Ente | { error: string }> {
+  try {
+    const res = await api.post("/entities", {
+      name: ente.nome,
+      email: ente.email,
+      phone: ente.telefono,
+      address: ente.indirizzo,
+    })
+    const entityLoad = res.data?.entity ?? res.data?.data?.entity ?? res.data
+    return normalizeEnte(entityLoad)
+  } catch {
+    return { error: "Errore durante la creazione dell'ente." }
+  }
+}
+
+export async function modifyEnte(ente: CreateEnteProps, id: string): Promise<Ente | { error: string }> {
+  try {
+    const res = await api.patch(`/entities/${id}`, {
+      name: ente.nome,
+      email: ente.email,
+      phone: ente.telefono,
+      address: ente.indirizzo,
+    })
+    const entityLoad = res.data?.entity ?? res.data?.data?.entity ?? res.data
+
+    if (entityLoad && typeof entityLoad === "object") {
+      return normalizeEnte(entityLoad)
+    }
+
+    const refreshedEntity = await fetchEnteToChange(id)
+    if (refreshedEntity) return refreshedEntity
+    return { error: "Errore durante il salvataggio dell'ente." }
+  } catch {
+    return { error: "Errore durante il salvataggio dell'ente." }
+  }
+}
+
+export type DeleteEnteResult =
+  | { status: "success" }
+  | { status: "not-found" }
+  | { status: "error"; message: string }
+
+export async function deleteEnte(id: string): Promise<DeleteEnteResult> {
+  try {
+    await api.delete(`/entities/${id}`)
+    return { status: "success" }
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return { status: "not-found" }
+    }
+
+    return {
+      status: "error",
+      message: "Errore durante l'eliminazione dell'ente.",
+    }
+  }
+}
+
 export async function modifyUser(utente: CreateUserProps, id: string): Promise<User> {
   const res = await api.patch(`/users/${id}`, utente)
   const userLoad = res.data?.user ?? res.data?.data?.user ?? res.data
@@ -263,6 +355,11 @@ export async function getGuests(): Promise<GuestSummary[]> {
   return guests.map(normalizeGuestSummary)
 }
 
+export async function getEnti(): Promise<Ente[]> {
+  const res = await api.get("/entities")
+  return extractEntities(res.data).map(normalizeEnte)
+}
+
 export async function fetchGuestToChange(id: string): Promise<GuestDetail | null> {
   try {
     const res = await api.get(`/guests/${id}`)
@@ -272,9 +369,18 @@ export async function fetchGuestToChange(id: string): Promise<GuestDetail | null
   }
 }
 
+export async function fetchEnteToChange(id: string): Promise<Ente | null> {
+  try {
+    const res = await api.get(`/entities/${id}`)
+    const entityLoad = res.data?.entity ?? res.data?.data?.entity ?? res.data
+    return normalizeEnte(entityLoad)
+  } catch {
+    return null
+  }
+}
+
 export async function getEntityNames(): Promise<string[]> {
-  const res = await api.get("/entities")
-  const entities = Array.isArray(res.data) ? (res.data as Entity[]) : []
+  const entities = await getEnti()
   return entities.map((entity) => entity.nome)
 }
 
