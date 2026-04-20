@@ -61,14 +61,17 @@ export function VisualizzaOspite() {
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
   const [isOspiteEnabled, setIsOspiteEnabled] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
   const [errorNotice, setErrorNotice] = useState("");
+  const [deleteFeedback, setDeleteFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [guestFound, setGuestFound] = useState(true);
 
-  const isFormDisabled = !isEditing || isSaving || isDeleting;
+  const isFormDisabled = !isEditing || isSaving || isDeleting || isDeleteDialogOpen || isDeleted;
 
   useEffect(() => {
     getEntityNames().then((data) => setEntityOptions(data));
@@ -240,30 +243,46 @@ export function VisualizzaOspite() {
   };
 
   const handleDeleteClick = async () => {
-    if (!id || isDeleting || isSaving) return;
+    if (!id || isDeleting || isSaving || isDeleteDialogOpen || isDeleted) return;
+    setDeleteFeedback("");
+    setIsDeleteDialogOpen(true);
+    setSubmitNotice("");
+    setErrorNotice("");
+  };
 
-    const isConfirmed = window.confirm("Confermi eliminazione ospite?");
-    if (!isConfirmed) return;
+  const handleCancelDelete = () => {
+    if (isDeleting) return;
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!id || isDeleting || isSaving || isDeleted) return;
 
     setIsDeleting(true);
     setSubmitNotice("");
     setErrorNotice("");
+    setDeleteFeedback("");
 
     const result = await deleteGuest(id);
     if (result.status === "success") {
-      setSubmitNotice("Ospite eliminato con successo. Reindirizzamento in corso...");
+      setIsDeleted(true);
+      setIsEditing(false);
+      setDeleteFeedback("Ospite cancellato con successo.");
+      setIsDeleteDialogOpen(false);
       setIsDeleting(false);
-      window.setTimeout(() => navigate("/anagrafica-ospiti"), 1800);
+      window.setTimeout(() => navigate("/anagrafica-ospiti"), 2500);
       return;
     }
 
     if (result.status === "not-found") {
-      setErrorNotice("Ospite non trovato o gia' eliminato.");
+      setDeleteFeedback("Ospite non trovato o gia' eliminato.");
+      setIsDeleteDialogOpen(false);
       setIsDeleting(false);
       return;
     }
 
-    setErrorNotice(result.message);
+    setDeleteFeedback(result.message);
+    setIsDeleteDialogOpen(false);
     setIsDeleting(false);
   };
 
@@ -295,7 +314,7 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => setIsOspiteEnabled((currentValue) => !currentValue)}
-          disabled={isSaving || isDeleting}
+          disabled={isSaving || isDeleting || isDeleteDialogOpen || isDeleted}
           aria-label={isOspiteEnabled ? "Disabilita ospite" : "Abilita ospite"}
           title={isOspiteEnabled ? "Disabilita ospite" : "Abilita ospite"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
@@ -310,7 +329,7 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => setIsEditing((currentValue) => !currentValue)}
-          disabled={isSaving || isDeleting}
+          disabled={isSaving || isDeleting || isDeleteDialogOpen || isDeleted}
           aria-label={isEditing ? "Blocca modifica" : "Modifica"}
           title={isEditing ? "Blocca modifica" : "Modifica"}
           className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
@@ -321,7 +340,7 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={handleDeleteClick}
-          disabled={isDeleting || isSaving}
+          disabled={isDeleting || isSaving || isDeleteDialogOpen || isDeleted}
           aria-label="Elimina ospite"
           title="Elimina ospite"
           className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-3 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
@@ -336,7 +355,7 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => navigate("/anagrafica-ospiti")}
-          disabled={isDeleting || isSaving}
+          disabled={isDeleting || isSaving || isDeleteDialogOpen || isDeleted}
           aria-label="Torna indietro"
           title="Torna indietro"
           className="ml-auto rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
@@ -345,6 +364,11 @@ export function VisualizzaOspite() {
         </button>
       </div>
 
+      {isDeleted ? (
+        <div className="mx-6 mt-8 rounded-lg border-2 border-red-800 bg-red-950/60 p-4">
+          <p className="font-bold text-red-200">{deleteFeedback || "Ospite eliminato."}</p>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-6 lg:grid-cols-2 lg:gap-x-8">
         <div className="flex items-center gap-3">
           <label htmlFor="name" className="min-w-28 text-sm font-semibold text-bianco">Nome</label>
@@ -661,7 +685,53 @@ export function VisualizzaOspite() {
             {errorNotice}
           </p>
         ) : null}
+        {deleteFeedback ? (
+          <p className="col-span-1 text-right text-xs font-semibold text-red-300 lg:col-span-2">
+            {deleteFeedback}
+          </p>
+        ) : null}
       </form>
+      )}
+
+      {isDeleteDialogOpen ? (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/65 px-4">
+          <div className="w-full max-w-[760px] rounded-2xl border-2 border-red-800 bg-amber-950 p-8 shadow-2xl">
+            <h2 className="text-2xl font-bold text-giallo">Conferma eliminazione</h2>
+            <p className="mt-4 text-xl font-semibold text-bianco">
+              Sei sicura/o di voler cancellare questo ospite?
+            </p>
+            <p className="mt-2 text-lg font-semibold text-bianco/85">
+              Questa azione e&apos; definitiva e non puo&apos; essere annullata.
+            </p>
+
+            <div className="mt-8 flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={handleCancelDelete}
+                disabled={isDeleting}
+                className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-6 py-2 text-lg font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-6 py-2 text-lg font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDeleting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 size={20} className="animate-spin" />
+                    Eliminazione...
+                  </span>
+                ) : (
+                  "Conferma"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
