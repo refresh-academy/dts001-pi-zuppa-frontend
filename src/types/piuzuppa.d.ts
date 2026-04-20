@@ -19,6 +19,14 @@ export type Entity = {
     via: string
 }
 
+export type Ente = {
+    id: string,
+    nome: string,
+    email: string,
+    telefono: string,
+    indirizzo: string
+}
+
 export type PuntoDiDistribuzione = string
 
 export type Ruolo = "cucina" | "magazzino" | "accoglienza"
@@ -94,4 +102,3 @@ export type GuestDetail = {
     enteSegnalazione: string,
     pasti: GuestMealDetail[]
 }
-

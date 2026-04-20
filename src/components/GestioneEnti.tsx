@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { RicercaTabella } from "./RicercaTabella";
-
-type Ente = {
-  id: string;
-  nome: string;
-  email: string;
-  telefono: string;
-  indirizzo: string;
-};
+import type { Ente } from "../types/piuzuppa";
 
 const columns = ["Nome", "email", "telefono", "indirizzo"];
 
