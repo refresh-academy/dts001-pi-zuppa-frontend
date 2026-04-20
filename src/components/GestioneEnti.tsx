@@ -1,39 +1,66 @@
-import { fetchUserToChange, getInitialUsers } from "../api/backend"
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { RicercaTabella } from "./RicercaTabella"
-import { User } from "../types/piuzuppa";
+import { useState } from "react";
+import { RicercaTabella } from "./RicercaTabella";
 
-const columns = ['Nome ente', 'e-mail', 'telefono', 'indirizzo'];
+type Ente = {
+  id: string;
+  nome: string;
+  email: string;
+  telefono: string;
+  indirizzo: string;
+};
 
-const staticRows = [
-    { id: '1', data: ['Caritas', 'caritas@email.it', '051 5815663', 'via avesella 15'] },
-    { id: '2', data: ['CSM', 'mazzacorati@email.it', '051783456', 'via toscana 18'] },
-    { id: '3', data: ['Comune di Bologna', 'comunebologna@email.it', '051891273', 'Piazza Maggiore 1'] },
+const columns = ["Nome", "email", "telefono", "indirizzo"];
+
+const enti: Ente[] = [
+  {
+    id: "1",
+    nome: "Caritas",
+    email: "caritas@email.it",
+    telefono: "051 5815663",
+    indirizzo: "Via Avesella 15",
+  },
+  {
+    id: "2",
+    nome: "CSM",
+    email: "mazzacorati@email.it",
+    telefono: "051783456",
+    indirizzo: "Via Toscana 18",
+  },
+  {
+    id: "3",
+    nome: "Comune di Bologna",
+    email: "comunebologna@email.it",
+    telefono: "051891273",
+    indirizzo: "Piazza Maggiore 1",
+  },
 ];
 
 export function GestioneEnti() {
-    const [rows, setRows] = useState<Ente[]>(staticRows);
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchValue = searchTerm.trim().toLowerCase();
 
-    const handleSearch = (value: string) => {
-        const filtered = staticRows.filter(ente =>
-            Object.values(ente).some(val =>
-                val.toLowerRows().includes(value.toLowerRows())
-            )
-        );
+  const filteredEnti = enti.filter((ente) =>
+    `${ente.nome} ${ente.email} ${ente.telefono} ${ente.indirizzo}`
+      .toLowerCase()
+      .includes(searchValue)
+  );
 
-        setRows(filtered);
-    };
+  const rows = filteredEnti.map((ente) => ({
+    id: ente.id,
+    data: [ente.nome, ente.email, ente.telefono, ente.indirizzo],
+  }));
 
-    return (
-        <RicercaTabella
-            title="Gestione Enti"
-            columns={columns}
-            rows={rows.map(r => ({
-                id: r.id,
-                data: [r.nome, r.email, r.telefono, r.indirizzo]
-            }))}
-            onSearchChange={handleSearch}
-        />
-    );
+  return (
+    <RicercaTabella
+      title="Gestione Enti"
+      columns={columns}
+      rows={rows}
+      onSearchChange={setSearchTerm}
+      searchLabel="Cerca utente"
+      searchPlaceholder="nome, email, telefono o indirizzo"
+      showNewButton={true}
+      newButtonLabel="Nuovo"
+      newButtonPath="/nuovo-ente"
+    />
+  );
 }

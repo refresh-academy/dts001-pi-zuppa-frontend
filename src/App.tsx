@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from "react-router"
 import type { SidebarConfig } from "./types/piuzuppa"
 import { NuovoOspite } from "./components/NuovoOspite"
 import { NuovoUtente } from "./components/NuovoUtente"
+import { NuovoEnte } from "./components/NuovoEnte"
 import { GestioneOspiti } from "./components/GestioneOspiti"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
@@ -153,6 +154,20 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="anagrafica-enti"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneEnti />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="nuovo-ospite"
@@ -177,6 +192,20 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <NuovoUtente />
+                  </div>
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="nuovo-ente"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <NuovoEnte />
                   </div>
                 </>
               </ProtectedRoute>
