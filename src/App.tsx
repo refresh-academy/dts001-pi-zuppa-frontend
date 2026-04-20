@@ -11,6 +11,7 @@ import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { VisualizzaOspite } from "./components/VisualizzaOspite"
+import { VisualizzaEnte } from "./components/VisualizzaEnte"
 import { GestioneEnti } from "./components/GestioneEnti"
 import { Tendone } from "./components/TopBar"
 import { useAuth } from "./components/AuthContext"
@@ -246,6 +247,19 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <VisualizzaOspite />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="visualizza-ente/:id"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <VisualizzaEnte />
                   </div>
                 </>
               </ProtectedRoute>

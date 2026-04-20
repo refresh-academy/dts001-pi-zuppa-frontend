@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { RicercaTabella } from "./RicercaTabella";
 import type { Ente } from "../types/piuzuppa";
 
@@ -29,6 +30,7 @@ const enti: Ente[] = [
 ];
 
 export function GestioneEnti() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("");
   const searchValue = searchTerm.trim().toLowerCase();
 
@@ -43,6 +45,10 @@ export function GestioneEnti() {
     data: [ente.nome, ente.email, ente.telefono, ente.indirizzo],
   }));
 
+  const handleRowClick = (id: string) => {
+    navigate(`/visualizza-ente/${id}`)
+  }
+
   return (
     <RicercaTabella
       title="Gestione Enti"
@@ -54,6 +60,7 @@ export function GestioneEnti() {
       showNewButton={true}
       newButtonLabel="Nuovo"
       newButtonPath="/nuovo-ente"
+      onRowClick={handleRowClick}
     />
   );
 }
