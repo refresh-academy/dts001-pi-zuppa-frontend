@@ -8,6 +8,8 @@ import { NuovoUtente } from "./components/NuovoUtente"
 import { NuovoEnte } from "./components/NuovoEnte"
 import { GestioneOspiti } from "./components/GestioneOspiti"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
+import { GestioneStoccaggio } from "./components/GestioneStoccaggio"
+import { GestionePrelievo } from "./components/GestionePrelievo"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { VisualizzaOspite } from "./components/VisualizzaOspite"
@@ -286,6 +288,32 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <GestioneMagazzino />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="stoccaggio"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneStoccaggio />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="prelievo"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestionePrelievo />
                   </div>
                 </>
               </ProtectedRoute>
