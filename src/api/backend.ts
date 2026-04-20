@@ -84,6 +84,19 @@ type CreateEnteProps = {
   indirizzo: string
 }
 
+export type GuestMealRecord = {
+  guestId: string
+  mealType: string
+  deliveryType: "mensa" | "asporto"
+}
+
+export type RecipeRequirement = {
+  recipeName: string
+  recipeDescription: string
+  productName: string
+  quantityPerMeal: number
+}
+
 function toArray<T>(value: T[] | T | null | undefined): T[] {
   if (Array.isArray(value)) return value
   if (value == null) return []
@@ -190,6 +203,65 @@ function extractEntities(entitiesLoad: any): any[] {
   if (Array.isArray(entitiesLoad?.data?.entities)) return entitiesLoad.data.entities
   if (Array.isArray(entitiesLoad?.data)) return entitiesLoad.data
   return []
+}
+
+function extractMealTypes(mealTypesLoad: any): any[] {
+  if (Array.isArray(mealTypesLoad)) return mealTypesLoad
+  if (Array.isArray(mealTypesLoad?.meal_types)) return mealTypesLoad.meal_types
+  if (Array.isArray(mealTypesLoad?.mealTypes)) return mealTypesLoad.mealTypes
+  if (Array.isArray(mealTypesLoad?.data?.meal_types)) return mealTypesLoad.data.meal_types
+  if (Array.isArray(mealTypesLoad?.data?.mealTypes)) return mealTypesLoad.data.mealTypes
+  if (Array.isArray(mealTypesLoad?.data)) return mealTypesLoad.data
+  return []
+}
+
+function extractGuestMeals(guestMealsLoad: any): any[] {
+  if (Array.isArray(guestMealsLoad)) return guestMealsLoad
+  if (Array.isArray(guestMealsLoad?.guest_meal)) return guestMealsLoad.guest_meal
+  if (Array.isArray(guestMealsLoad?.guestMeals)) return guestMealsLoad.guestMeals
+  if (Array.isArray(guestMealsLoad?.data?.guest_meal)) return guestMealsLoad.data.guest_meal
+  if (Array.isArray(guestMealsLoad?.data?.guestMeals)) return guestMealsLoad.data.guestMeals
+  if (Array.isArray(guestMealsLoad?.data)) return guestMealsLoad.data
+  return []
+}
+
+function normalizeGuestMealRow(raw: any): GuestMealRecord | null {
+  const mealType = String(
+    raw?.meal_type ?? raw?.mealType ?? raw?.tipo ?? "",
+  ).trim()
+  const deliveryTypeRaw = String(
+    raw?.ricevimento_pasto ?? raw?.delivery_type ?? raw?.deliveryType ?? raw?.consegna ?? "",
+  )
+    .trim()
+    .toLowerCase()
+  const guestId = String(raw?.guest_id ?? raw?.guestId ?? raw?.id ?? "")
+
+  if (!mealType) return null
+  if (deliveryTypeRaw !== "mensa" && deliveryTypeRaw !== "asporto") return null
+
+  return {
+    guestId,
+    mealType,
+    deliveryType: deliveryTypeRaw,
+  }
+}
+
+function normalizeRecipeRequirementRow(raw: any): RecipeRequirement | null {
+  const recipeName = String(raw?.recipe_name ?? raw?.recipeName ?? "").trim()
+  const productName = String(raw?.product_name ?? raw?.productName ?? "").trim()
+  const recipeDescription = String(
+    raw?.recipe_description ?? raw?.recipeDescription ?? "",
+  ).trim()
+  const quantityRaw = Number(raw?.quantity_per_meal ?? raw?.quantityPerMeal ?? NaN)
+
+  if (!recipeName || !productName || !Number.isFinite(quantityRaw)) return null
+
+  return {
+    recipeName,
+    recipeDescription,
+    productName,
+    quantityPerMeal: quantityRaw,
+  }
 }
 
 export async function createUser(utente: CreateUserProps): Promise<User | { error: string }> {
@@ -394,8 +466,78 @@ export async function getSiteNames(): Promise<string[]> {
 
 export async function getMealTypes(): Promise<string[]> {
   const res = await api.get("/meal_types")
-  const mealTypes = Array.isArray(res.data) ? (res.data as Meal[]) : []
-  return mealTypes.map((mealType) => mealType.tipo)
+  const mealTypes = extractMealTypes(res.data)
+
+  return Array.from(
+    new Set(
+      mealTypes
+        .map((mealType: Meal | string) =>
+          String(
+            typeof mealType === "string"
+              ? mealType
+              : mealType?.tipo ?? "",
+          ).trim(),
+        )
+        .filter((mealType) => mealType !== ""),
+    ),
+  )
+}
+
+export async function getGuestMealRecords(): Promise<GuestMealRecord[]> {
+  try {
+    const res = await api.get("/guest_meal")
+    const directRows = extractGuestMeals(res.data)
+      .map(normalizeGuestMealRow)
+      .filter((row): row is GuestMealRecord => row !== null)
+
+    if (directRows.length > 0) {
+      return directRows
+    }
+  } catch {
+    // fallback to guest detail endpoint when /guest_meal is not exposed by backend
+  }
+
+  const guests = await getGuests()
+  const guestDetailsResult = await Promise.allSettled(
+    guests.map((guest) => fetchGuestToChange(guest.id)),
+  )
+
+  const fallbackRows: GuestMealRecord[] = []
+
+  guestDetailsResult.forEach((result) => {
+    if (result.status !== "fulfilled" || !result.value) return
+    const guest = result.value
+
+    guest.pasti.forEach((meal) => {
+      const mealType = String(meal.mealType ?? "").trim()
+      const deliveryType = String(meal.deliveryType ?? "").trim().toLowerCase()
+
+      if (!mealType) return
+      if (deliveryType !== "mensa" && deliveryType !== "asporto") return
+
+      fallbackRows.push({
+        guestId: guest.id,
+        mealType,
+        deliveryType,
+      })
+    })
+  })
+
+  return fallbackRows
+}
+
+export async function getRecipeRequirements(): Promise<RecipeRequirement[]> {
+  const res = await api.get("/recipes/requirements")
+
+  const rows = Array.isArray(res.data)
+    ? res.data
+    : Array.isArray(res.data?.data)
+      ? res.data.data
+      : []
+
+  return rows
+    .map(normalizeRecipeRequirementRow)
+    .filter((row): row is RecipeRequirement => row !== null)
 }
 
 

@@ -10,6 +10,7 @@ import { GestioneOspiti } from "./components/GestioneOspiti"
 import { GestioneMagazzino } from "./components/GestioneMagazzino"
 import { GestioneStoccaggio } from "./components/GestioneStoccaggio"
 import { GestionePrelievo } from "./components/GestionePrelievo"
+import { GestioneCucina } from "./components/GestioneCucina"
 import { GestioneUtenti } from "./components/GestioneUtenti"
 import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { VisualizzaOspite } from "./components/VisualizzaOspite"
@@ -314,6 +315,19 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <GestionePrelievo />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="cucina"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneCucina />
                   </div>
                 </>
               </ProtectedRoute>
