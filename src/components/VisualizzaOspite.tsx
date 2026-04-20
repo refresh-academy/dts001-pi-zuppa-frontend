@@ -13,7 +13,13 @@ import {
   Undo2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
-import { fetchGuestToChange, getEntityNames, getMealTypes } from "../api/backend";
+import {
+  deleteGuest,
+  fetchGuestToChange,
+  getEntityNames,
+  getMealTypes,
+  modifyGuest,
+} from "../api/backend";
 
 type MealType = string;
 type DeliveryType = "" | "mensa" | "asporto";
@@ -53,18 +59,16 @@ export function VisualizzaOspite() {
   const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [familyCount, setFamilyCount] = useState<number | "">("");
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
-  const [isMealWarningOpen, setIsMealWarningOpen] = useState(false);
   const [isOspiteEnabled, setIsOspiteEnabled] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
+  const [errorNotice, setErrorNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [guestFound, setGuestFound] = useState(true);
 
-  const normalizedFamilyCount = familyCount === "" ? 0 : familyCount;
-  const hasMealCountError =
-    normalizedFamilyCount > 0 && mealRows.length < normalizedFamilyCount;
-  const isFormDisabled = !isEditing;
+  const isFormDisabled = !isEditing || isSaving || isDeleting;
 
   useEffect(() => {
     getEntityNames().then((data) => setEntityOptions(data));
@@ -110,28 +114,6 @@ export function VisualizzaOspite() {
     void loadGuest();
   }, [id]);
 
-  useEffect(() => {
-    const targetRows = familyCount === "" ? 0 : Math.max(0, familyCount);
-
-    setMealRows((currentRows) => {
-      if (currentRows.length === targetRows) return currentRows;
-
-      if (currentRows.length < targetRows) {
-        const nextRows = [...currentRows];
-        let nextId = nextRows.length > 0 ? nextRows[nextRows.length - 1].id + 1 : 1;
-
-        while (nextRows.length < targetRows) {
-          nextRows.push({ id: nextId, tipo: mealTypeOptions[0] ?? "", consegna: "" });
-          nextId += 1;
-        }
-
-        return nextRows;
-      }
-
-      return currentRows.slice(0, targetRows);
-    });
-  }, [familyCount, mealTypeOptions]);
-
   const addMealRow = () => {
     setMealRows((currentRows) => {
       const nextId =
@@ -160,25 +142,84 @@ export function VisualizzaOspite() {
     );
   };
 
-  const finalizeSubmit = () => {
-    setSubmitNotice("Registrazione confermata.");
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitNotice("");
-
-    if (hasMealCountError) {
-      setIsMealWarningOpen(true);
+  const saveGuestChanges = async () => {
+    if (!id) {
+      setErrorNotice("ID ospite non valido.");
       return;
     }
 
-    finalizeSubmit();
+    if (familyCount === "") {
+      setErrorNotice("Inserisci il numero di familiari.");
+      return;
+    }
+
+    if (mealRows.length === 0) {
+      setErrorNotice("Inserisci almeno un pasto.");
+      return;
+    }
+
+    if (mealRows.some((row) => row.tipo.trim() === "" || row.consegna === "")) {
+      setErrorNotice("Completa tipo e consegna per tutti i pasti.");
+      return;
+    }
+
+    setIsSaving(true);
+    setSubmitNotice("");
+    setErrorNotice("");
+
+    const result = await modifyGuest(
+      {
+        name: formData.nome.trim(),
+        surname: formData.cognome.trim(),
+        resident: formData.residente,
+        birthDate: formData.dataNascita,
+        familyCount: Number(familyCount),
+        profession: formData.professione.trim(),
+        phone: formData.telefono.trim(),
+        entityName: formData.enteSegnalazione,
+        meals: mealRows.map((meal) => ({
+          mealType: meal.tipo,
+          deliveryType: meal.consegna as Exclude<DeliveryType, "">,
+        })),
+      },
+      id,
+    );
+
+    if ("error" in result) {
+      setErrorNotice(result.error);
+      setIsSaving(false);
+      return;
+    }
+
+    setFormData({
+      nome: result.nome,
+      cognome: result.cognome,
+      dataNascita: result.dataNascita,
+      residente: result.residente,
+      professione: result.professione,
+      telefono: result.telefono,
+      enteSegnalazione: result.enteSegnalazione,
+    });
+    setFamilyCount(result.numeroFamiliari);
+    setMealRows(
+      result.pasti.map((meal, index) => ({
+        id: meal.id || index + 1,
+        tipo: meal.mealType,
+        consegna: meal.deliveryType,
+      })),
+    );
+
+    setIsEditing(false);
+    setSubmitNotice("Ospite salvato con successo.");
+    setIsSaving(false);
   };
 
-  const handleConfirmContinue = () => {
-    setIsMealWarningOpen(false);
-    finalizeSubmit();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitNotice("");
+    setErrorNotice("");
+
+    await saveGuestChanges();
   };
 
   const handleOpenDatePicker = () => {
@@ -198,9 +239,32 @@ export function VisualizzaOspite() {
     inputElement.click();
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
+    if (!id || isDeleting || isSaving) return;
+
+    const isConfirmed = window.confirm("Confermi eliminazione ospite?");
+    if (!isConfirmed) return;
+
     setIsDeleting(true);
-    window.setTimeout(() => setIsDeleting(false), 700);
+    setSubmitNotice("");
+    setErrorNotice("");
+
+    const result = await deleteGuest(id);
+    if (result.status === "success") {
+      setSubmitNotice("Ospite eliminato con successo. Reindirizzamento in corso...");
+      setIsDeleting(false);
+      window.setTimeout(() => navigate("/anagrafica-ospiti"), 1800);
+      return;
+    }
+
+    if (result.status === "not-found") {
+      setErrorNotice("Ospite non trovato o gia' eliminato.");
+      setIsDeleting(false);
+      return;
+    }
+
+    setErrorNotice(result.message);
+    setIsDeleting(false);
   };
 
   if (isLoading) {
@@ -231,9 +295,10 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => setIsOspiteEnabled((currentValue) => !currentValue)}
+          disabled={isSaving || isDeleting}
           aria-label={isOspiteEnabled ? "Disabilita ospite" : "Abilita ospite"}
           title={isOspiteEnabled ? "Disabilita ospite" : "Abilita ospite"}
-          className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
+          className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isOspiteEnabled ? (
             <ShieldX size={18} strokeWidth={2.4} />
@@ -245,9 +310,10 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => setIsEditing((currentValue) => !currentValue)}
+          disabled={isSaving || isDeleting}
           aria-label={isEditing ? "Blocca modifica" : "Modifica"}
           title={isEditing ? "Blocca modifica" : "Modifica"}
-          className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
+          className="rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <SquarePen size={18} strokeWidth={2.4} />
         </button>
@@ -255,9 +321,10 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={handleDeleteClick}
+          disabled={isDeleting || isSaving}
           aria-label="Elimina ospite"
           title="Elimina ospite"
-          className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-3 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
+          className="rounded-xl border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-3 py-1.5 font-bold text-red-950 shadow-[0_4px_0_0_#5c1717] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isDeleting ? (
             <Loader2 size={18} strokeWidth={2.4} className="animate-spin" />
@@ -269,9 +336,10 @@ export function VisualizzaOspite() {
         <button
           type="button"
           onClick={() => navigate("/anagrafica-ospiti")}
+          disabled={isDeleting || isSaving}
           aria-label="Torna indietro"
           title="Torna indietro"
-          className="ml-auto rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
+          className="ml-auto rounded-xl border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] p-1.5 font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417] transition duration-150 hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Undo2 size={18} strokeWidth={2.4} />
         </button>
@@ -519,7 +587,7 @@ export function VisualizzaOspite() {
                 {mealRows.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="border border-amber-900 px-2 py-2 text-center text-[11px] text-bordeaux/80">
-                      Inserisci il numero familiari per generare le righe dei pasti.
+                      Aggiungi un pasto con il pulsante +.
                     </td>
                   </tr>
                 ) : (
@@ -576,9 +644,10 @@ export function VisualizzaOspite() {
         <div className="col-span-1 flex justify-end pt-2 lg:col-span-2">
           <button
             type="submit"
+            disabled={isFormDisabled}
             className="h-10 rounded-md bg-amber-900 px-5 text-sm font-bold text-white shadow-lg transition-all hover:bg-amber-800 active:scale-95"
           >
-            Salva
+            {isSaving ? "Salvataggio..." : "Salva"}
           </button>
         </div>
 
@@ -587,37 +656,12 @@ export function VisualizzaOspite() {
             {submitNotice}
           </p>
         ) : null}
+        {errorNotice ? (
+          <p className="col-span-1 text-right text-xs font-semibold text-red-300 lg:col-span-2">
+            {errorNotice}
+          </p>
+        ) : null}
       </form>
-
-      {isMealWarningOpen ? (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/65">
-          <div className="mx-4 w-full max-w-xl rounded-xl border-2 border-red-800 bg-amber-950 p-5 shadow-2xl">
-            <h2 className="text-lg font-bold text-giallo">Attenzione</h2>
-            <p className="mt-3 text-bianco">
-              Hai selezionato meno pasti del numero dei famigliari.
-            </p>
-            <p className="mt-1 text-sm font-semibold text-red-300">
-              Sei sicura/o di voler continuare?
-            </p>
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsMealWarningOpen(false)}
-                className="rounded-md border-2 border-amber-950 bg-[linear-gradient(180deg,#fff6df_0%,#f1c97b_30%,#bd7b36_100%)] px-4 py-1.5 text-sm font-bold text-amber-950 shadow-[0_4px_0_0_#5c3417]"
-              >
-                Annulla
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmContinue}
-                className="rounded-md border-2 border-red-950 bg-[linear-gradient(180deg,#ffdcdc_0%,#f38585_30%,#b93535_100%)] px-4 py-1.5 text-sm font-bold text-red-950 shadow-[0_4px_0_0_#5c1717]"
-              >
-                Continua
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

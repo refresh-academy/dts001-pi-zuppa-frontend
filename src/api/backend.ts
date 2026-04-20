@@ -56,6 +56,18 @@ type CreateGuestProps = {
   meals: CreateGuestMeal[]
 }
 
+type UpdateGuestProps = {
+  name: string
+  surname: string
+  resident: boolean
+  birthDate: string
+  familyCount: number
+  profession: string
+  phone: string
+  entityName: string
+  meals: CreateGuestMeal[]
+}
+
 function toArray<T>(value: T[] | T | null | undefined): T[] {
   if (Array.isArray(value)) return value
   if (value == null) return []
@@ -172,6 +184,44 @@ export async function createGuest(guest: CreateGuestProps): Promise<{ status: "s
     return { status: "success" }
   } catch {
     return { error: "Errore durante la creazione dell'ospite." }
+  }
+}
+
+export async function modifyGuest(guest: UpdateGuestProps, id: string): Promise<GuestDetail | { error: string }> {
+  try {
+    const res = await api.patch(`/guests/${id}`, guest)
+    const guestLoad = res.data?.guest ?? res.data?.data?.guest ?? res.data
+
+    if (guestLoad && typeof guestLoad === "object") {
+      return normalizeGuestDetail(guestLoad)
+    }
+
+    const refreshedGuest = await fetchGuestToChange(id)
+    if (refreshedGuest) return refreshedGuest
+    return { error: "Errore durante il salvataggio dell'ospite." }
+  } catch {
+    return { error: "Errore durante il salvataggio dell'ospite." }
+  }
+}
+
+export type DeleteGuestResult =
+  | { status: "success" }
+  | { status: "not-found" }
+  | { status: "error"; message: string }
+
+export async function deleteGuest(id: string): Promise<DeleteGuestResult> {
+  try {
+    await api.delete(`/guests/${id}`)
+    return { status: "success" }
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return { status: "not-found" }
+    }
+
+    return {
+      status: "error",
+      message: "Errore durante l'eliminazione dell'ospite.",
+    }
   }
 }
 
