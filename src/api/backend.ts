@@ -528,16 +528,18 @@ export async function getGuestMealRecords(): Promise<GuestMealRecord[]> {
 
 export async function getRecipeRequirements(): Promise<RecipeRequirement[]> {
   const res = await api.get("/recipes/requirements")
+  const payload = res.data as { data?: unknown }
+  let rows: unknown[] = []
 
-  const rows = Array.isArray(res.data)
-    ? res.data
-    : Array.isArray(res.data?.data)
-      ? res.data.data
-      : []
+  if (Array.isArray(res.data)) {
+    rows = res.data
+  } else if (Array.isArray(payload.data)) {
+    rows = payload.data
+  }
 
   return rows
-    .map(normalizeRecipeRequirementRow)
-    .filter((row): row is RecipeRequirement => row !== null)
+    .map((row: unknown) => normalizeRecipeRequirementRow(row))
+    .filter((row: RecipeRequirement | null): row is RecipeRequirement => row !== null)
 }
 
 
