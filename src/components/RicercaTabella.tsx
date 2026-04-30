@@ -97,7 +97,7 @@ export function RicercaTabella({
                   <tr
                     key={row.id}
                     onClick={onRowClick ? () => onRowClick(row.id) : undefined}
-                    className={`border-t-2 border-amber-900/40 ${onRowClick ? "cursor-pointer hover:bg-amber-100/70 transition-colors" : ""}`}
+                    className={`border-t-2 border-amber-900/40 odd:bg-sabbia even:bg-[#f4dd88] ${onRowClick ? "cursor-pointer transition-colors hover:bg-amber-100/70" : ""}`}
                   >
                     <td className="px-4 py-3"></td>
                     {row.data.map((cell, i) => (
