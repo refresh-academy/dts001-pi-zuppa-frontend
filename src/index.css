@@ -36,3 +36,16 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.table-panel {
+  border: 12px solid;
+  border-top-color: #78350f;
+  border-bottom-color: #78350f;
+  border-left-color: #92400e;
+  border-right-color: #92400e;
+  border-radius: 1rem;
+  background-color: #451a03;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+}

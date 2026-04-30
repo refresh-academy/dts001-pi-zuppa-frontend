@@ -286,12 +286,7 @@ export function GestioneCucina() {
 
   return (
     <section
-      className="top-0 ml-4 mt-6 min-h-[60vh] w-full rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 px-8 py-8 shadow-2xl"
-      style={{
-        backgroundColor: "#0a0a0a",
-        backgroundImage:
-          "radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 48%), radial-gradient(circle at 85% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 42%)",
-      }}
+      className="table-panel top-0 ml-4 mt-6 min-h-[60vh] w-full px-8 py-8 shadow-2xl"
     >
       <div className="flex flex-wrap items-center gap-4">
         <div>

@@ -52,12 +52,7 @@ export function NuovoEnte() {
 
   return (
     <div
-      className="top-0 ml-4 mt-6 min-h-[60vh] w-full rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 p-8 shadow-2xl md:p-10"
-      style={{
-        backgroundColor: "#0a0a0a",
-        backgroundImage:
-          "radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)",
-      }}
+      className="table-panel top-0 ml-4 mt-6 min-h-[60vh] w-full p-8 shadow-2xl md:p-10"
     >
       <div className="mx-auto w-full max-w-5xl">
         <h1 className="text-left text-2xl font-bold text-giallo">Nuovo Ente</h1>

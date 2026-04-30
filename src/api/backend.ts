@@ -527,19 +527,32 @@ export async function getGuestMealRecords(): Promise<GuestMealRecord[]> {
 }
 
 export async function getRecipeRequirements(): Promise<RecipeRequirement[]> {
-  const res = await api.get("/recipes/requirements")
-  const payload = res.data as { data?: unknown }
-  let rows: unknown[] = []
+  const parseRecipeRequirementRows = (data: unknown): RecipeRequirement[] => {
+    const payload = data as { data?: unknown }
+    let rows: unknown[] = []
 
-  if (Array.isArray(res.data)) {
-    rows = res.data
-  } else if (Array.isArray(payload.data)) {
-    rows = payload.data
+    if (Array.isArray(data)) {
+      rows = data
+    } else if (Array.isArray(payload.data)) {
+      rows = payload.data
+    }
+
+    return rows
+      .map((row: unknown) => normalizeRecipeRequirementRow(row))
+      .filter((row: RecipeRequirement | null): row is RecipeRequirement => row !== null)
   }
 
-  return rows
-    .map((row: unknown) => normalizeRecipeRequirementRow(row))
-    .filter((row: RecipeRequirement | null): row is RecipeRequirement => row !== null)
+  try {
+    const res = await api.get("/recipes/requirements")
+    return parseRecipeRequirementRows(res.data)
+  } catch (err) {
+    if (!axios.isAxiosError(err) || err.response?.status !== 404) {
+      throw err
+    }
+
+    const fallbackRes = await api.get("/api/recipes/requirements")
+    return parseRecipeRequirementRows(fallbackRes.data)
+  }
 }
 
 

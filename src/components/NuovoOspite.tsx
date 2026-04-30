@@ -262,11 +262,7 @@ export function NuovoOspite() {
 
   return (
     <div 
-      className="relative top-0 ml-4 mt-6 min-h-[60vh] w-full rounded-2xs border-12 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 py-6 pr-6 shadow-2xl" 
-      style={{ 
-        backgroundColor: "#0a0a0a", 
-        backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)`, 
-      }}
+      className="table-panel relative top-0 ml-4 mt-6 min-h-[60vh] w-full py-6 pr-6 shadow-2xl"
     >
       <h1 className="pl-6 text-xl font-bold text-giallo">Nuovo Ospite</h1>
       <p className="pl-6 pt-1 text-xs font-semibold text-bianco/90">
