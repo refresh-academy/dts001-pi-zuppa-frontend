@@ -133,76 +133,83 @@ export function GestioneMagazzino() {
 
   return (
     <div className="w-full">
-      <div className="ml-4 mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div className="rounded-xl border-2 border-amber-900 bg-black/40 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-giallo/80">
-            Totale prodotti
-          </p>
-          <p className="mt-2 text-2xl font-bold text-bianco">{prodottiIniziali.length}</p>
-        </div>
-        <div className="rounded-xl border-2 border-red-800 bg-red-950/40 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-red-200">
-            Sotto scorta
-          </p>
-          <p className="mt-2 text-2xl font-bold text-red-100">{sottoScortaCount}</p>
-        </div>
-        <div className="rounded-xl border-2 border-amber-800 bg-amber-950/40 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
-            In scadenza
-          </p>
-          <p className="mt-2 text-2xl font-bold text-amber-100">{inScadenzaCount}</p>
-        </div>
-        <div className="rounded-xl border-2 border-red-900 bg-red-950/55 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Scaduti</p>
-          <p className="mt-2 text-2xl font-bold text-red-200">{scadutiCount}</p>
-        </div>
-      </div>
+      <div className="table-panel ml-4 mt-6 w-full p-6 shadow-2xl">
+        <h1 className="text-2xl font-bold text-giallo">Panoramica Magazzino</h1>
+        <p className="pt-1 text-sm font-semibold text-bianco/85">
+          Controlla rapidamente scorte, prodotti in scadenza e situazioni critiche.
+        </p>
 
-      <div className="ml-4 mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setStatusFilter("tutti")}
-          className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
-            statusFilter === "tutti"
-              ? "border-amber-700 bg-giallo text-bordeaux"
-              : "border-amber-900 bg-black/50 text-giallo"
-          }`}
-        >
-          Tutti
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("sotto-scorta")}
-          className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
-            statusFilter === "sotto-scorta"
-              ? "border-red-700 bg-red-300 text-red-900"
-              : "border-red-900 bg-black/50 text-red-200"
-          }`}
-        >
-          Sotto scorta
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("in-scadenza")}
-          className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
-            statusFilter === "in-scadenza"
-              ? "border-amber-700 bg-amber-200 text-amber-950"
-              : "border-amber-900 bg-black/50 text-amber-200"
-          }`}
-        >
-          In scadenza
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("scaduti")}
-          className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
-            statusFilter === "scaduti"
-              ? "border-red-800 bg-red-400 text-red-950"
-              : "border-red-900 bg-black/50 text-red-300"
-          }`}
-        >
-          Scaduti
-        </button>
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="rounded-lg border border-amber-900 bg-black/35 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-giallo/80">
+              Totale prodotti
+            </p>
+            <p className="mt-1 text-lg font-bold text-bianco">{prodottiIniziali.length}</p>
+          </div>
+          <div className="rounded-lg border border-red-900 bg-black/35 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-200">
+              Sotto scorta
+            </p>
+            <p className="mt-1 text-lg font-bold text-red-100">{sottoScortaCount}</p>
+          </div>
+          <div className="rounded-lg border border-amber-800 bg-black/35 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
+              In scadenza
+            </p>
+            <p className="mt-1 text-lg font-bold text-amber-100">{inScadenzaCount}</p>
+          </div>
+          <div className="rounded-lg border border-red-950 bg-black/35 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-300">Scaduti</p>
+            <p className="mt-1 text-lg font-bold text-red-200">{scadutiCount}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("tutti")}
+            className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
+              statusFilter === "tutti"
+                ? "border-amber-700 bg-giallo text-bordeaux"
+                : "border-amber-900 bg-black/50 text-giallo"
+            }`}
+          >
+            Tutti
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("sotto-scorta")}
+            className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
+              statusFilter === "sotto-scorta"
+                ? "border-red-700 bg-red-300 text-red-900"
+                : "border-red-900 bg-black/50 text-red-200"
+            }`}
+          >
+            Sotto scorta
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("in-scadenza")}
+            className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
+              statusFilter === "in-scadenza"
+                ? "border-amber-700 bg-amber-200 text-amber-950"
+                : "border-amber-900 bg-black/50 text-amber-200"
+            }`}
+          >
+            In scadenza
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("scaduti")}
+            className={`rounded-md border px-3 py-1.5 text-sm font-bold ${
+              statusFilter === "scaduti"
+                ? "border-red-800 bg-red-400 text-red-950"
+                : "border-red-900 bg-black/50 text-red-300"
+            }`}
+          >
+            Scaduti
+          </button>
+        </div>
       </div>
 
       <RicercaTabella
