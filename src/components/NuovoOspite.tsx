@@ -75,14 +75,14 @@ export function SiteSelect({ id = "site", name = "site" }: SiteSelectProps) {
 export function NuovoOspite() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const dateInputRef = useRef<HTMLInputElement | null>(null);
-  const [familyCount, setFamilyCount] = useState<number | "">("");
+  const [familyCount, setFamilyCount] = useState<number | "">(1);
   const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
   const [isMealWarningOpen, setIsMealWarningOpen] = useState(false);
   const [submitNotice, setSubmitNotice] = useState("");
   const [errorNotice, setErrorNotice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const normalizedFamilyCount = familyCount === "" ? 0 : familyCount;
+  const normalizedFamilyCount = familyCount === "" ? 1 : familyCount;
   const hasMealCountError =
     normalizedFamilyCount > 0 && mealRows.length < normalizedFamilyCount;
 
@@ -101,7 +101,7 @@ export function NuovoOspite() {
   }, [mealTypeOptions]);
 
   useEffect(() => {
-    const targetRows = familyCount === "" ? 0 : Math.max(0, familyCount);
+    const targetRows = familyCount === "" ? 0 : Math.max(1, familyCount);
 
     setMealRows((currentRows) => {
       if (currentRows.length === targetRows) return currentRows;
@@ -217,7 +217,7 @@ export function NuovoOspite() {
 
     finalizeSubmit()
     formElement.reset()
-    setFamilyCount("")
+    setFamilyCount(1)
     setMealRows([])
     setIsSubmitting(false)
   }
@@ -358,7 +358,7 @@ export function NuovoOspite() {
               id="familyCount"
               name="familyCount"
               type="number"
-              min={0}
+              min={1}
               required
               value={familyCount}
               onChange={(event) => {
@@ -368,7 +368,7 @@ export function NuovoOspite() {
                   return;
                 }
                 const numericValue = Number(rawValue);
-                if (!Number.isNaN(numericValue) && numericValue >= 0) {
+                if (!Number.isNaN(numericValue) && numericValue >= 1) {
                   setFamilyCount(numericValue);
                 }
               }}
@@ -390,7 +390,7 @@ export function NuovoOspite() {
                 type="button"
                 onClick={() =>
                   setFamilyCount((currentValue) => {
-                    if (currentValue === "" || currentValue <= 0) return 0;
+                    if (currentValue === "" || currentValue <= 1) return 1;
                     return currentValue - 1;
                   })
                 }

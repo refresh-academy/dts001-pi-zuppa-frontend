@@ -74,6 +74,7 @@ type UpdateGuestProps = {
   profession: string
   phone: string
   entityName: string
+  siteName: string
   meals: CreateGuestMeal[]
 }
 
@@ -107,6 +108,18 @@ function cleanPgArray(value: any): string[] {
   if (typeof value !== "string") return toArray(value);
   const cleaned = value.replace(/[{}"\\]/g, "").trim();
   return cleaned === "" ? [] : cleaned.split(",").map(s => s.trim());
+}
+
+function normalizeFamilyCount(raw: any): number {
+  const familyCount = Number(
+    raw?.numero_famigliari ??
+      raw?.numeroFamiliari ??
+      raw?.numeri_famigliari ??
+      raw?.familyCount ??
+      1,
+  )
+
+  return Number.isFinite(familyCount) && familyCount >= 1 ? familyCount : 1
 }
 
 function normalizeUser(raw: any): User {
@@ -146,7 +159,7 @@ function normalizeGuestSummary(raw: any): GuestSummary {
     cognome: String(raw?.cognome ?? ""),
     dataNascita: formatItalianDate(raw?.data_nascita),
     telefono: String(raw?.telefono ?? ""),
-    numeroFamiliari: Number(raw?.numeri_famigliari ?? 0),
+    numeroFamiliari: normalizeFamilyCount(raw),
     residente: Boolean(raw?.residente),
     numeroPasti: guestMeals.length,
   }
@@ -171,10 +184,25 @@ function normalizeGuestDetail(raw: any): GuestDetail {
       typeof raw?.data_nascita === "string"
         ? raw.data_nascita.slice(0, 10)
         : "",
-    numeroFamiliari: Number(raw?.numeri_famigliari ?? 0),
+    numeroFamiliari: normalizeFamilyCount(raw),
     professione: String(raw?.professione ?? ""),
     telefono: String(raw?.telefono ?? ""),
-    enteSegnalazione: String(raw?.entity_name ?? ""),
+    enteSegnalazione: String(
+      raw?.entity_name ??
+        raw?.entityName ??
+        raw?.entity?.nome ??
+        raw?.entity?.name ??
+        raw?.entity ??
+        "",
+    ),
+    puntoDistribuzione: String(
+      raw?.site_name ??
+        raw?.siteName ??
+        raw?.site?.nome ??
+        raw?.site?.name ??
+        raw?.site ??
+        "",
+    ),
     pasti,
   }
 }
@@ -305,7 +333,14 @@ export async function modifyGuest(guest: UpdateGuestProps, id: string): Promise<
     const refreshedGuest = await fetchGuestToChange(id)
     if (refreshedGuest) return refreshedGuest
     return { error: "Errore durante il salvataggio dell'ospite." }
-  } catch {
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const serverMessage = err.response?.data?.error
+      if (typeof serverMessage === "string" && serverMessage.trim() !== "") {
+        return { error: serverMessage }
+      }
+    }
+
     return { error: "Errore durante il salvataggio dell'ospite." }
   }
 }

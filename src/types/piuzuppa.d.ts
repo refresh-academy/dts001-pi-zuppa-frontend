@@ -100,5 +100,6 @@ export type GuestDetail = {
     professione: string,
     telefono: string,
     enteSegnalazione: string,
+    puntoDistribuzione: string,
     pasti: GuestMealDetail[]
 }

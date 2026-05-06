@@ -18,6 +18,7 @@ import {
   fetchGuestToChange,
   getEntityNames,
   getMealTypes,
+  getSiteNames,
   modifyGuest,
 } from "../api/backend";
 
@@ -38,6 +39,7 @@ type GuestFormState = {
   professione: string;
   telefono: string;
   enteSegnalazione: string;
+  puntoDistribuzione: string;
 };
 
 const initialFormData: GuestFormState = {
@@ -48,6 +50,7 @@ const initialFormData: GuestFormState = {
   professione: "",
   telefono: "",
   enteSegnalazione: "",
+  puntoDistribuzione: "",
 };
 
 export function VisualizzaOspite() {
@@ -56,6 +59,7 @@ export function VisualizzaOspite() {
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState<GuestFormState>(initialFormData);
   const [entityOptions, setEntityOptions] = useState<string[]>([]);
+  const [siteOptions, setSiteOptions] = useState<string[]>([]);
   const [mealTypeOptions, setMealTypeOptions] = useState<MealType[]>([]);
   const [familyCount, setFamilyCount] = useState<number | "">("");
   const [mealRows, setMealRows] = useState<MealRow[]>([]);
@@ -72,9 +76,20 @@ export function VisualizzaOspite() {
   const [guestFound, setGuestFound] = useState(true);
 
   const isFormDisabled = !isEditing || isSaving || isDeleting || isDeleteDialogOpen || isDeleted;
+  const entitySelectOptions =
+    formData.enteSegnalazione &&
+    !entityOptions.includes(formData.enteSegnalazione)
+      ? [formData.enteSegnalazione, ...entityOptions]
+      : entityOptions;
+  const siteSelectOptions =
+    formData.puntoDistribuzione &&
+    !siteOptions.includes(formData.puntoDistribuzione)
+      ? [formData.puntoDistribuzione, ...siteOptions]
+      : siteOptions;
 
   useEffect(() => {
     getEntityNames().then((data) => setEntityOptions(data));
+    getSiteNames().then((data) => setSiteOptions(data));
     getMealTypes().then((data) => setMealTypeOptions(data));
   }, []);
 
@@ -101,6 +116,7 @@ export function VisualizzaOspite() {
         professione: guest.professione,
         telefono: guest.telefono,
         enteSegnalazione: guest.enteSegnalazione,
+        puntoDistribuzione: guest.puntoDistribuzione,
       });
       setFamilyCount(guest.numeroFamiliari);
       setMealRows(
@@ -156,6 +172,11 @@ export function VisualizzaOspite() {
       return;
     }
 
+    if (familyCount < 1) {
+      setErrorNotice("Il numero di familiari deve essere almeno 1.");
+      return;
+    }
+
     if (mealRows.length === 0) {
       setErrorNotice("Inserisci almeno un pasto.");
       return;
@@ -163,6 +184,16 @@ export function VisualizzaOspite() {
 
     if (mealRows.some((row) => row.tipo.trim() === "" || row.consegna === "")) {
       setErrorNotice("Completa tipo e consegna per tutti i pasti.");
+      return;
+    }
+
+    if (formData.enteSegnalazione.trim() === "") {
+      setErrorNotice("Seleziona l'ente di segnalazione.");
+      return;
+    }
+
+    if (formData.puntoDistribuzione.trim() === "") {
+      setErrorNotice("Seleziona il punto di distribuzione.");
       return;
     }
 
@@ -179,7 +210,8 @@ export function VisualizzaOspite() {
         familyCount: Number(familyCount),
         profession: formData.professione.trim(),
         phone: formData.telefono.trim(),
-        entityName: formData.enteSegnalazione,
+        entityName: formData.enteSegnalazione.trim(),
+        siteName: formData.puntoDistribuzione.trim(),
         meals: mealRows.map((meal) => ({
           mealType: meal.tipo,
           deliveryType: meal.consegna as Exclude<DeliveryType, "">,
@@ -202,6 +234,7 @@ export function VisualizzaOspite() {
       professione: result.professione,
       telefono: result.telefono,
       enteSegnalazione: result.enteSegnalazione,
+      puntoDistribuzione: result.puntoDistribuzione,
     });
     setFamilyCount(result.numeroFamiliari);
     setMealRows(
@@ -487,7 +520,7 @@ export function VisualizzaOspite() {
             <input
               id="familyCount"
               type="number"
-              min={0}
+              min={1}
               value={familyCount}
               onChange={(event) => {
                 const rawValue = event.target.value;
@@ -496,7 +529,7 @@ export function VisualizzaOspite() {
                   return;
                 }
                 const numericValue = Number(rawValue);
-                if (!Number.isNaN(numericValue) && numericValue >= 0) {
+                if (!Number.isNaN(numericValue) && numericValue >= 1) {
                   setFamilyCount(numericValue);
                 }
               }}
@@ -520,7 +553,7 @@ export function VisualizzaOspite() {
                 type="button"
                 onClick={() =>
                   setFamilyCount((currentValue) => {
-                    if (currentValue === "" || currentValue <= 0) return 0;
+                    if (currentValue === "" || currentValue <= 1) return 1;
                     return currentValue - 1;
                   })
                 }
@@ -546,9 +579,34 @@ export function VisualizzaOspite() {
               className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pl-2.5 pr-10 text-sm text-bordeaux outline-none"
             >
               <option value="" disabled>Seleziona ente</option>
-              {entityOptions.map((entityName) => (
+              {entitySelectOptions.map((entityName) => (
                 <option key={entityName} value={entityName}>
                   {entityName}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border-2 border-bordeaux bg-giallo px-1.5 py-0.5 text-xs leading-none text-bordeaux shadow-sm">
+              <ChevronDown size={12} strokeWidth={2.8} />
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="site" className="min-w-28 text-sm font-semibold text-bianco">Punto di Distribuzione</label>
+          <div className="relative w-full">
+            <select
+              id="site"
+              value={formData.puntoDistribuzione}
+              onChange={(event) =>
+                setFormData((current) => ({ ...current, puntoDistribuzione: event.target.value }))
+              }
+              disabled={isFormDisabled}
+              className="h-10 w-full appearance-none rounded-md border-2 border-bordeaux bg-sabbia pl-2.5 pr-10 text-sm text-bordeaux outline-none"
+            >
+              <option value="" disabled>Seleziona punto</option>
+              {siteSelectOptions.map((siteName) => (
+                <option key={siteName} value={siteName}>
+                  {siteName}
                 </option>
               ))}
             </select>
