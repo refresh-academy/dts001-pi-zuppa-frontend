@@ -35,6 +35,7 @@ type GuestFormState = {
   nome: string;
   cognome: string;
   dataNascita: string;
+  nazionalita: string;
   residente: boolean;
   professione: string;
   telefono: string;
@@ -46,6 +47,7 @@ const initialFormData: GuestFormState = {
   nome: "",
   cognome: "",
   dataNascita: "",
+  nazionalita: "",
   residente: true,
   professione: "",
   telefono: "",
@@ -112,6 +114,7 @@ export function VisualizzaOspite() {
         nome: guest.nome,
         cognome: guest.cognome,
         dataNascita: guest.dataNascita,
+        nazionalita: guest.nazionalita,
         residente: guest.residente,
         professione: guest.professione,
         telefono: guest.telefono,
@@ -177,6 +180,11 @@ export function VisualizzaOspite() {
       return;
     }
 
+    if (formData.nazionalita.trim() === "") {
+      setErrorNotice("Inserisci la nazionalità.");
+      return;
+    }
+
     if (mealRows.length === 0) {
       setErrorNotice("Inserisci almeno un pasto.");
       return;
@@ -207,6 +215,7 @@ export function VisualizzaOspite() {
         surname: formData.cognome.trim(),
         resident: formData.residente,
         birthDate: formData.dataNascita,
+        nationality: formData.nazionalita.trim(),
         familyCount: Number(familyCount),
         profession: formData.professione.trim(),
         phone: formData.telefono.trim(),
@@ -230,6 +239,7 @@ export function VisualizzaOspite() {
       nome: result.nome,
       cognome: result.cognome,
       dataNascita: result.dataNascita,
+      nazionalita: result.nazionalita,
       residente: result.residente,
       professione: result.professione,
       telefono: result.telefono,
@@ -450,6 +460,20 @@ export function VisualizzaOspite() {
               <CalendarDays size={14} strokeWidth={2.7} />
             </button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="nationality" className="min-w-28 text-sm font-semibold text-bianco">Nazionalità</label>
+          <input
+            id="nationality"
+            type="text"
+            value={formData.nazionalita}
+            onChange={(event) =>
+              setFormData((current) => ({ ...current, nazionalita: event.target.value }))
+            }
+            disabled={isFormDisabled}
+            className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
+          />
         </div>
 
         <div className="flex items-center gap-3">

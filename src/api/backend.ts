@@ -57,6 +57,7 @@ type CreateGuestProps = {
   surname: string
   resident: boolean
   birthDate: string
+  nationality: string
   familyCount: number
   profession: string
   phone: string
@@ -70,6 +71,7 @@ type UpdateGuestProps = {
   surname: string
   resident: boolean
   birthDate: string
+  nationality: string
   familyCount: number
   profession: string
   phone: string
@@ -184,6 +186,7 @@ function normalizeGuestDetail(raw: any): GuestDetail {
       typeof raw?.data_nascita === "string"
         ? raw.data_nascita.slice(0, 10)
         : "",
+    nazionalita: String(raw?.nazionalita ?? raw?.nationality ?? ""),
     numeroFamiliari: normalizeFamilyCount(raw),
     professione: String(raw?.professione ?? ""),
     telefono: String(raw?.telefono ?? ""),

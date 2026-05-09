@@ -168,6 +168,7 @@ export function NuovoOspite() {
     const nameValue = formData.get("name")
     const surnameValue = formData.get("surname")
     const birthDateValue = formData.get("birthDate")
+    const nationalityValue = formData.get("nationality")
     const residentValue = formData.get("resident")
     const professionValue = formData.get("profession")
     const phoneValue = formData.get("phone")
@@ -179,6 +180,7 @@ export function NuovoOspite() {
       typeof nameValue !== "string" ||
       typeof surnameValue !== "string" ||
       typeof birthDateValue !== "string" ||
+      typeof nationalityValue !== "string" ||
       typeof residentValue !== "string" ||
       typeof professionValue !== "string" ||
       typeof phoneValue !== "string" ||
@@ -186,6 +188,11 @@ export function NuovoOspite() {
       typeof siteNameValue !== "string"
     ) {
       setErrorNotice("Compila tutti i campi obbligatori.")
+      return
+    }
+
+    if (nationalityValue.trim() === "") {
+      setErrorNotice("Inserisci la nazionalità.")
       return
     }
 
@@ -198,6 +205,7 @@ export function NuovoOspite() {
       surname: surnameValue.trim(),
       resident: residentValue === "si",
       birthDate: birthDateValue,
+      nationality: nationalityValue.trim(),
       familyCount: Number(familyCountValue),
       profession: professionValue.trim(),
       phone: phoneValue.trim(),
@@ -313,6 +321,17 @@ export function NuovoOspite() {
               <CalendarDays size={14} strokeWidth={2.7} />
             </button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="nationality" className="min-w-28 text-sm font-semibold text-bianco">Nazionalità</label>
+          <input
+            id="nationality"
+            name="nationality"
+            type="text"
+            required
+            className="h-10 w-full rounded-md border-2 border-bordeaux bg-sabbia px-2.5 text-sm text-bordeaux outline-none"
+          />
         </div>
 
         <div className="flex items-center gap-3">
