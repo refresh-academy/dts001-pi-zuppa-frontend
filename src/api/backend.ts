@@ -19,6 +19,7 @@ export type VerifyCredentialsResult =
   | { status: "success"; user: User }
   | { status: "username-error" }
   | { status: "password-error" }
+  | { status: "abilitation-error" }
 
 export async function verifyCredentials(
   username: string,
@@ -29,6 +30,7 @@ export async function verifyCredentials(
 
   if (!userWithUsername) return { status: "username-error" };
   if (userWithUsername.password !== password) return { status: "password-error" };
+  if (!userWithUsername.abilitazione) return { status: "abilitation-error" };
 
   return { status: "success", user: userWithUsername };
 }

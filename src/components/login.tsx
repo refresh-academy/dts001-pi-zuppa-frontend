@@ -39,6 +39,12 @@ export function Login() {
       setErrorMessage("Password non corretta")
       return
     }
+
+    else if (result.status === "abilitation-error") {
+      setSuccessMessage("")
+      setErrorMessage("Utente disabilitato. Contatta un coordinatore.")
+      return
+    }
   }
 
   return (
