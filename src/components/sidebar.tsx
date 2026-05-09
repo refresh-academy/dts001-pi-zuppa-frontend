@@ -27,7 +27,7 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
       </NavLink>
 
       {subItems && (
-        <div className="invisible group-hover:visible absolute left-full top-0 ml-2 z-[300] min-w-60">
+        <div className="invisible absolute left-full top-[-1.5rem] z-[300] min-w-60 pl-2 group-hover:visible">
           <div 
             className="p-4 rounded-xs border-8 border-y-amber-900 border-x-amber-800 shadow-2xl"
             style={{
@@ -53,7 +53,7 @@ const SidebarItem = ({ path, label, subItems }: SidebarItemProps) => {
             </ul>
           </div>
     
-          <div className="absolute top-4 -left-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-amber-900" />
+          <div className="absolute top-10 left-0 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-amber-900" />
         </div>
       )}
     </li>
