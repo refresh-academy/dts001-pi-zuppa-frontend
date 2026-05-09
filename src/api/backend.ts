@@ -127,6 +127,7 @@ function normalizeFamilyCount(raw: any): number {
 function normalizeUser(raw: any): User {
   const puntiDistribuzione = (Array.isArray(raw?.sites) ? raw.sites : []) as PuntoDiDistribuzione[];
   const ruoli = (Array.isArray(raw?.roles) ? raw.roles : []) as Ruolo[];
+  const abilitazioneRaw = raw?.abilitazione ?? raw?.abilitation ?? true;
 
   return {
     id: String(raw?.id ?? ""),
@@ -137,7 +138,10 @@ function normalizeUser(raw: any): User {
     telefono: String(raw?.telefono ?? ""),
     email: String(raw?.email ?? ""),
     livelloAccesso: (raw?.livello_accesso ?? raw?.livelloAccesso ?? "volontario") as User["livelloAccesso"],
-    abilitazione: Boolean(raw?.abilitazione ?? true),
+    abilitazione:
+      typeof abilitazioneRaw === "string"
+        ? abilitazioneRaw.toLowerCase() === "true"
+        : Boolean(abilitazioneRaw),
     puntiDistribuzione,
     ruoli,
   };

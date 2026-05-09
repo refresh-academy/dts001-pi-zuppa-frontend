@@ -67,6 +67,7 @@ export function ModificaUtente({
                 username: newUsername,
                 password: newPassword,
                 accessLevel: newAccessLevel,
+                abilitation: userToChange.abilitazione,
                 site: newSite,
                 role: newRole,
               },
