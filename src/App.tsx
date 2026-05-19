@@ -16,6 +16,8 @@ import { VisualizzaUtente } from "./components/VisuallizzaUtente"
 import { VisualizzaOspite } from "./components/VisualizzaOspite"
 import { VisualizzaEnte } from "./components/VisualizzaEnte"
 import { GestioneEnti } from "./components/GestioneEnti"
+import { GestioneAccoglienzaDistribuzione } from "./components/GestioneAccoglienzaDistribuzione"
+import { ConsegnaPasto } from "./components/ConsegnaPasto"
 import { Tendone } from "./components/TopBar"
 import { useAuth } from "./components/AuthContext"
 
@@ -113,14 +115,38 @@ function App() {
                         <p className="mt-3 text-bordeaux/90">
                           Siamo felici di averti qui!
                         </p>
-                        <div className="mt-6 rounded-xl bg-white/55 p-4 shadow-md">
-                          <p className="font-bold text-bordeaux">Come orientarti rapidamente:</p>
-                          <p className="mt-2 text-bordeaux/95">
-                            Nel menu a sinistra trovi le sezioni di navigazione.
-                          </p>
-                          <p className="text-bordeaux/95">
-                            In alto a destra puoi cambiare il punto di distribuzione.
-                          </p>
+                        <div
+                          className="relative mt-6 overflow-hidden rounded-2xs border-8 border-t-amber-900 border-b-amber-900 border-l-amber-800 border-r-amber-800 p-4 font-chalk shadow-2xl"
+                          style={{
+                            backgroundColor: "#0a0a0a",
+                            backgroundImage: `
+                              radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+                            `,
+                          }}
+                        >
+                          <div className="pointer-events-none absolute bottom-0 left-0 h-16 w-16 bg-linear-to-tr from-white/5 to-transparent" />
+                          <div className="pointer-events-none absolute right-0 top-0 h-12 w-12 bg-linear-to-bl from-white/5 to-transparent" />
+                          <div className="relative z-10">
+                            <p
+                              className="text-xl text-giallo"
+                              style={{ textShadow: "0 0 5px rgba(255, 255, 255, 0.3), 1px 1px 1px rgba(0,0,0,0.2)" }}
+                            >
+                              Come orientarti rapidamente:
+                            </p>
+                            <p
+                              className="mt-2 text-white"
+                              style={{ textShadow: "0 0 3px rgba(255, 255, 255, 0.4)" }}
+                            >
+                              Nel menu a sinistra trovi le sezioni di navigazione.
+                            </p>
+                            <p
+                              className="text-white"
+                              style={{ textShadow: "0 0 3px rgba(255, 255, 255, 0.4)" }}
+                            >
+                              In alto a destra puoi cambiare il punto di distribuzione.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </section>
@@ -328,6 +354,32 @@ function App() {
                   <div className="flex mr-4">
                     <Sidebar sidebarItems={sidebarItems} />
                     <GestioneCucina />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="accoglienza"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <GestioneAccoglienzaDistribuzione/>
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+          <Route
+            path="consegna-pasto/:id"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Tendone />
+                  <div className="flex mr-4">
+                    <Sidebar sidebarItems={sidebarItems} />
+                    <ConsegnaPasto />
                   </div>
                 </>
               </ProtectedRoute>
