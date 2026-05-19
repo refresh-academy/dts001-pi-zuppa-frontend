@@ -82,6 +82,12 @@ type UpdateGuestProps = {
   meals: CreateGuestMeal[]
 }
 
+type UpdateMealLogProps = {
+  deliveryType: "mensa" | "asporto"
+  numberOfMeals: number
+  datemark: string
+}
+
 type CreateEnteProps = {
   nome: string
   email: string
@@ -93,6 +99,14 @@ export type GuestMealRecord = {
   guestId: string
   mealType: string
   deliveryType: "mensa" | "asporto"
+}
+
+export type MealLogSummary = {
+  id: string
+  guestName: string
+  mealsCount: number
+  receivingMode: "" | "mensa" | "asporto"
+  delivered: boolean
 }
 
 export type RecipeRequirement = {
@@ -262,6 +276,18 @@ function extractGuestMeals(guestMealsLoad: any): any[] {
   return []
 }
 
+function extractMealLogs(mealLogsLoad: any): any[] {
+  if (Array.isArray(mealLogsLoad)) return mealLogsLoad
+  if (Array.isArray(mealLogsLoad?.meallogs)) return mealLogsLoad.meallogs
+  if (Array.isArray(mealLogsLoad?.meal_logs)) return mealLogsLoad.meal_logs
+  if (Array.isArray(mealLogsLoad?.mealLogs)) return mealLogsLoad.mealLogs
+  if (Array.isArray(mealLogsLoad?.data?.meallogs)) return mealLogsLoad.data.meallogs
+  if (Array.isArray(mealLogsLoad?.data?.meal_logs)) return mealLogsLoad.data.meal_logs
+  if (Array.isArray(mealLogsLoad?.data?.mealLogs)) return mealLogsLoad.data.mealLogs
+  if (Array.isArray(mealLogsLoad?.data)) return mealLogsLoad.data
+  return []
+}
+
 function normalizeGuestMealRow(raw: any): GuestMealRecord | null {
   const mealType = String(
     raw?.meal_type ?? raw?.mealType ?? raw?.tipo ?? "",
@@ -280,6 +306,72 @@ function normalizeGuestMealRow(raw: any): GuestMealRecord | null {
     guestId,
     mealType,
     deliveryType: deliveryTypeRaw,
+  }
+}
+
+function normalizeBoolean(value: unknown): boolean {
+  if (typeof value === "boolean") return value
+  if (typeof value === "number") return value === 1
+  if (typeof value !== "string") return false
+
+  const normalized = value.trim().toLowerCase()
+  return ["true", "1", "si", "sì", "yes", "y", "consegnato", "delivered"].includes(normalized)
+}
+
+function normalizeDeliveryType(value: unknown): "" | "mensa" | "asporto" {
+  const normalized = String(value ?? "").trim().toLowerCase()
+  if (normalized === "mensa" || normalized === "asporto") return normalized
+  return ""
+}
+
+function normalizeMealLogRow(raw: any): MealLogSummary | null {
+  const guestName = String(
+    raw?.guest_name ??
+      raw?.guestName ??
+      raw?.ospite ??
+      raw?.guest?.name ??
+      raw?.guest?.nome ??
+      `${raw?.nome ?? ""} ${raw?.cognome ?? ""}`,
+  ).trim()
+
+  const mealsRaw =
+    raw?.number_of_meals ??
+    raw?.numberOfMeals ??
+    raw?.numero_pasti ??
+    raw?.numeroPasti ??
+    raw?.meals_count ??
+    raw?.mealsCount ??
+    raw?.quantity ??
+    raw?.count ??
+    (Array.isArray(raw?.meals) ? raw.meals.length : NaN)
+  const mealsCount = Number(mealsRaw)
+
+  if (!guestName || !Number.isFinite(mealsCount)) return null
+
+  return {
+    id: String(raw?.id ?? raw?.meal_log_id ?? raw?.mealLogId ?? raw?.guest_id ?? raw?.guestId ?? guestName),
+    guestName,
+    mealsCount,
+    receivingMode: normalizeDeliveryType(
+      raw?.receiving_mode ??
+        raw?.receivingMode ??
+        raw?.modalita_ricevimento ??
+        raw?.modalitaRicevimento ??
+        raw?.ricevimento_pasto ??
+        raw?.delivery_type ??
+        raw?.deliveryType ??
+        raw?.consegna ??
+        "",
+    ),
+    delivered: normalizeBoolean(
+      raw?.delivered ??
+        raw?.consegnato ??
+        raw?.consegnata ??
+        raw?.is_delivered ??
+        raw?.isDelivered ??
+        raw?.delivery_done ??
+        raw?.deliveryDone,
+    ),
   }
 }
 
@@ -568,6 +660,86 @@ export async function getGuestMealRecords(): Promise<GuestMealRecord[]> {
   })
 
   return fallbackRows
+}
+
+export async function getMealLogs(): Promise<MealLogSummary[]> {
+  const parseMealLogs = (data: unknown): MealLogSummary[] =>
+    extractMealLogs(data)
+      .map(normalizeMealLogRow)
+      .filter((row): row is MealLogSummary => row !== null)
+
+  try {
+    const res = await api.get("/meal_logs")
+    return parseMealLogs(res.data)
+  } catch (err) {
+    if (!axios.isAxiosError(err) || err.response?.status !== 404) {
+      throw err
+    }
+  }
+
+  try {
+    const res = await api.get("/meallogs")
+    return parseMealLogs(res.data)
+  } catch (err) {
+    if (!axios.isAxiosError(err) || err.response?.status !== 404) {
+      throw err
+    }
+  }
+
+  const guests = await getGuests()
+  return guests.map((guest) => ({
+    id: guest.id,
+    guestName: `${guest.nome} ${guest.cognome}`.trim(),
+    mealsCount: guest.numeroPasti,
+    receivingMode: "",
+    delivered: false,
+  }))
+}
+
+export async function fetchMealLogToChange(id: string): Promise<MealLogSummary | null> {
+  const mealLogs = await getMealLogs()
+  return mealLogs.find((mealLog) => mealLog.id === id) ?? null
+}
+
+export async function updateMealLog(
+  id: string,
+  mealLog: UpdateMealLogProps,
+): Promise<MealLogSummary | { error: string }> {
+  const payload = {
+    id,
+    mealLogId: id,
+    meal_log_id: id,
+    deliveryType: mealLog.deliveryType,
+    delivery_type: mealLog.deliveryType,
+    numberOfMeals: mealLog.numberOfMeals,
+    number_of_meals: mealLog.numberOfMeals,
+    datemark: mealLog.datemark,
+    delivered: true,
+  }
+
+  const parseUpdatedMealLog = (data: unknown): MealLogSummary | null => {
+    const response = data as { mealLog?: unknown; meal_log?: unknown; data?: unknown }
+    const raw =
+      response?.mealLog ??
+      response?.meal_log ??
+      response?.data ??
+      data
+
+    return normalizeMealLogRow(raw)
+  }
+
+  try {
+    const res = await api.put("/meal_logs", payload)
+    return parseUpdatedMealLog(res.data) ?? {
+      id,
+      guestName: "",
+      mealsCount: mealLog.numberOfMeals,
+      receivingMode: mealLog.deliveryType,
+      delivered: true,
+    }
+  } catch {
+    return { error: "Errore durante la conferma della consegna." }
+  }
 }
 
 export async function getRecipeRequirements(): Promise<RecipeRequirement[]> {
