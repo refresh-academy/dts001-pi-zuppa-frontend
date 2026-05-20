@@ -67,11 +67,7 @@ export function RicercaTabella({
       {/* Table Section */}
       <div className="px-8">
         
-        {/* 
-          Main Table Wrapper Box with clip-path.
-          - Changed to 'rounded-b-3xl' for significantly rounder corners.
-          - Added 'overflow-hidden' to ensure the bottom row background clips neatly into the curve.
-        */}
+        {/* Main Table Wrapper Box */}
         <div 
           className="relative rounded-b-3xl bg-[#fffdf9] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden"
           style={{
@@ -169,7 +165,14 @@ export function RicercaTabella({
                   <tr
                     key={row.id}
                     onClick={onRowClick ? () => onRowClick(row.id) : undefined}
-                    className={`border-t border-bordeaux/10 odd:bg-[#fffdf9] even:bg-[#faf4e4] ${onRowClick ? "cursor-pointer transition-colors hover:bg-sabbia/40" : ""}`}
+                    /* 
+                      Soft Mid-way Hover Effect:
+                      - Keeps bordeaux text color for consistent contrast.
+                      - Uses a solid, richer yellow-sabbia accent tone (#ecd9aa) to blend beautifully.
+                    */
+                    className={`border-t border-bordeaux/10 odd:bg-[#fffdf9] even:bg-[#faf4e4] transition-colors duration-150 ${
+                      onRowClick ? "cursor-pointer hover:bg-[#ecd9aa]" : ""
+                    }`}
                   >
                     {/* Left vertical Bordeaux margin line */}
                     <td className="px-4 py-3 border-r border-bordeaux/20 relative">
