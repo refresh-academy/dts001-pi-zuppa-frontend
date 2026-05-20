@@ -83,9 +83,9 @@ type UpdateGuestProps = {
 }
 
 type UpdateMealLogProps = {
-  deliveryType: "mensa" | "asporto"
-  numberOfMeals: number
+  meals: MealLogMealDetail[]
   datemark: string
+  siteName?: string | null
 }
 
 type CreateEnteProps = {
@@ -107,6 +107,13 @@ export type MealLogSummary = {
   mealsCount: number
   receivingMode: "" | "mensa" | "asporto"
   delivered: boolean
+  meals: MealLogMealDetail[]
+}
+
+export type MealLogMealDetail = {
+  mealType: string
+  quantity: number
+  deliveryType: "" | "mensa" | "asporto"
 }
 
 export type RecipeRequirement = {
@@ -334,7 +341,7 @@ function normalizeMealLogRow(raw: any): MealLogSummary | null {
       `${raw?.nome ?? ""} ${raw?.cognome ?? ""}`,
   ).trim()
 
-  const mealsRaw =
+  const mealsCountRaw =
     raw?.number_of_meals ??
     raw?.numberOfMeals ??
     raw?.numero_pasti ??
@@ -344,9 +351,37 @@ function normalizeMealLogRow(raw: any): MealLogSummary | null {
     raw?.quantity ??
     raw?.count ??
     (Array.isArray(raw?.meals) ? raw.meals.length : NaN)
-  const mealsCount = Number(mealsRaw)
+  const mealsCount = Number(mealsCountRaw)
 
   if (!guestName || !Number.isFinite(mealsCount)) return null
+
+  const mealDetailsRaw = Array.isArray(raw?.meals)
+    ? raw.meals
+    : Array.isArray(raw?.meal_details)
+      ? raw.meal_details
+      : Array.isArray(raw?.mealDetails)
+        ? raw.mealDetails
+        : []
+  const meals = mealDetailsRaw
+    .map((meal: any): MealLogMealDetail | null => {
+      const mealType = String(meal?.meal_type ?? meal?.mealType ?? meal?.tipo ?? "").trim()
+      const quantity = Number(meal?.quantity ?? meal?.count ?? meal?.numero_pasti ?? meal?.numeroPasti ?? 0)
+
+      if (!mealType || !Number.isFinite(quantity)) return null
+
+      return {
+        mealType,
+        quantity,
+        deliveryType: normalizeDeliveryType(
+          meal?.delivery_type ??
+            meal?.deliveryType ??
+            meal?.modalita_ricevimento ??
+            meal?.modalitaRicevimento ??
+            "",
+        ),
+      }
+    })
+    .filter((meal: MealLogMealDetail | null): meal is MealLogMealDetail => meal !== null)
 
   return {
     id: String(raw?.id ?? raw?.meal_log_id ?? raw?.mealLogId ?? raw?.guest_id ?? raw?.guestId ?? guestName),
@@ -372,6 +407,7 @@ function normalizeMealLogRow(raw: any): MealLogSummary | null {
         raw?.delivery_done ??
         raw?.deliveryDone,
     ),
+    meals,
   }
 }
 
@@ -693,6 +729,7 @@ export async function getMealLogs(): Promise<MealLogSummary[]> {
     mealsCount: guest.numeroPasti,
     receivingMode: "",
     delivered: false,
+    meals: [],
   }))
 }
 
@@ -709,11 +746,18 @@ export async function updateMealLog(
     id,
     mealLogId: id,
     meal_log_id: id,
-    deliveryType: mealLog.deliveryType,
-    delivery_type: mealLog.deliveryType,
-    numberOfMeals: mealLog.numberOfMeals,
-    number_of_meals: mealLog.numberOfMeals,
+    numberOfMeals: mealLog.meals.reduce((total, meal) => total + meal.quantity, 0),
+    number_of_meals: mealLog.meals.reduce((total, meal) => total + meal.quantity, 0),
+    meals: mealLog.meals.map((meal) => ({
+      mealType: meal.mealType,
+      meal_type: meal.mealType,
+      quantity: meal.quantity,
+      deliveryType: meal.deliveryType,
+      delivery_type: meal.deliveryType,
+    })),
     datemark: mealLog.datemark,
+    siteName: mealLog.siteName,
+    site_name: mealLog.siteName,
     delivered: true,
   }
 
@@ -733,9 +777,10 @@ export async function updateMealLog(
     return parseUpdatedMealLog(res.data) ?? {
       id,
       guestName: "",
-      mealsCount: mealLog.numberOfMeals,
-      receivingMode: mealLog.deliveryType,
+      mealsCount: mealLog.meals.reduce((total, meal) => total + meal.quantity, 0),
+      receivingMode: mealLog.meals[0]?.deliveryType ?? "",
       delivered: true,
+      meals: mealLog.meals,
     }
   } catch {
     return { error: "Errore durante la conferma della consegna." }
