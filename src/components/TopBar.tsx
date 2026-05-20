@@ -4,6 +4,12 @@ import { ChevronDown } from "lucide-react";
 import logolineare from "../assets/piùZuppa-logolineare.svg";
 import { useAuth } from "./AuthContext"; 
 import type { PuntoDiDistribuzione } from "../types/piuzuppa";
+import { getSites } from "../api/backend";
+
+const bolognaCoordinates = {
+    latitude: 44.49,
+    longitude: 11.34,
+};
 
 export const Tendone = () => {
     const { user, currentSite, logout, updateSite } = useAuth(); 
@@ -20,7 +26,11 @@ export const Tendone = () => {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const url = "https://api.open-meteo.com/v1/forecast?latitude=44.49&longitude=11.34&current=temperature_2m,weather_code&timezone=Europe%2FBerlin";
+                const sites = await getSites();
+                const selectedSite = sites.find((site) => site.nome === currentSite);
+                const latitude = selectedSite?.latitude ?? bolognaCoordinates.latitude;
+                const longitude = selectedSite?.longitude ?? bolognaCoordinates.longitude;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=Europe%2FBerlin`;
                 const res = await fetch(url);
                 const data = await res.json();
                 const tempNum = Math.round(data.current.temperature_2m);
@@ -39,7 +49,7 @@ export const Tendone = () => {
             }
         };
         fetchWeather();
-    }, []);
+    }, [currentSite]);
 
     const handleLogout = () => {
         logout();

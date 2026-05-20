@@ -110,6 +110,12 @@ export type MealLogSummary = {
   meals: MealLogMealDetail[]
 }
 
+export type SiteSummary = {
+  nome: string
+  latitude: number | null
+  longitude: number | null
+}
+
 export type MealLogMealDetail = {
   mealType: string
   quantity: number
@@ -244,6 +250,17 @@ function normalizeEnte(raw: any): Ente {
     email: String(raw?.email ?? raw?.mail ?? ""),
     telefono: String(raw?.telefono ?? raw?.phone ?? ""),
     indirizzo: String(raw?.indirizzo ?? raw?.via ?? raw?.address ?? ""),
+  }
+}
+
+function normalizeSite(raw: any): SiteSummary {
+  const latitude = Number(raw?.latitude ?? raw?.latitudine ?? NaN)
+  const longitude = Number(raw?.longitude ?? raw?.longitudine ?? NaN)
+
+  return {
+    nome: String(raw?.nome ?? raw?.name ?? ""),
+    latitude: Number.isFinite(latitude) ? latitude : null,
+    longitude: Number.isFinite(longitude) ? longitude : null,
   }
 }
 
@@ -629,11 +646,14 @@ export async function getEntityNames(): Promise<string[]> {
 }
 
 export async function getSiteNames(): Promise<string[]> {
+  const sites = await getSites()
+  return sites.map((site) => site.nome).filter((siteName) => siteName !== "")
+}
+
+export async function getSites(): Promise<SiteSummary[]> {
   const res = await api.get("/sites")
   const sites = Array.isArray(res.data) ? res.data : []
-  return sites
-    .map((site) => String(site?.nome ?? "").trim())
-    .filter((siteName) => siteName !== "")
+  return sites.map(normalizeSite)
 }
 
 export async function getMealTypes(): Promise<string[]> {
